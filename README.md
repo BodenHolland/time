@@ -1,2 +1,2 @@
 # time
-Repository to host time project data 
+Repository to host time project data.  
