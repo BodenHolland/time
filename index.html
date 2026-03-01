@@ -14,8 +14,8 @@
             --face-color: #ffffff;
             --text-color: #1a1a1a;
             --accent-color: #ff3b30;
-            --clock-size: 85vmin;
-            --label-size: 11vmin;
+            --clock-size: 75vmin;
+            --label-size: 8vmin;
             --reality-ease: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -32,30 +32,45 @@
             overflow: hidden;
         }
 
-        /* Premium Multi-layered Bezel */
+        /* Premium Milled Metal Bezel */
         #clock-bezel {
             width: var(--clock-size);
             height: var(--clock-size);
-            border: 0.3vmin solid #000;
+            border: 0.2vmin solid #b5b5b5;
+            /* Significantly sharper, solid metallic outline */
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             box-sizing: border-box;
-            background: var(--face-color);
-            /* Internal Depth Only */
-            box-shadow: inset 0 0 4vmin rgba(0, 0, 0, 0.02);
+            background: linear-gradient(135deg, #d8d8d8 0%, #f4f4f4 50%, #b0b0b0 100%);
+            /* High contrast against the #fcfcfc white background */
+            /* Creates the physical structural thickness of the ring */
+            padding: 2.5vmin;
+            /* Internal machining highlights and chamfers (no outer page bleed) */
+            box-shadow:
+                inset 0.3vmin 0.3vmin 0.8vmin rgba(255, 255, 255, 1),
+                inset -0.4vmin -0.4vmin 1.5vmin rgba(0, 0, 0, 0.15),
+                inset 1vmin 1vmin 3vmin rgba(255, 255, 255, 0.4);
             transform: translateZ(0);
         }
 
-        /* Lens Effect Gradient */
+        /* Recessed Dial with Domed Glass Illusion */
         #clock-face {
             width: 100%;
             height: 100%;
             position: relative;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #fff 0%, #f9f9f9 100%);
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f4f4f4 100%);
+            /* Bezel lip shadow casting downwards, plus extreme concavity depth */
+            box-shadow:
+                0.3vmin 0.5vmin 1.5vmin rgba(0, 0, 0, 0.1),
+                /* Rim casting shadow onto dial edge */
+                inset 2vmin 2vmin 5vmin rgba(0, 0, 0, 0.06),
+                /* Sunken darkness */
+                inset -1vmin -1vmin 3vmin rgba(255, 255, 255, 1);
+            /* Bottom highlight catching light */
         }
 
         /* Viscous Trail Elements */
@@ -131,18 +146,23 @@
             align-items: center;
             justify-content: center;
             letter-spacing: -0.05em;
-            filter: drop-shadow(0 0.5vmin 1vmin rgba(0, 0, 0, 0.03));
             transform: translate(-50%, -50%);
         }
 
         .hour-label {
             font-weight: 500;
             font-size: calc(var(--label-size) * 1.15);
+            /* Make it float noticeably higher */
+            filter: drop-shadow(-1vmin 1.5vmin 1.5vmin rgba(0, 0, 0, 0.12));
+            z-index: 12;
         }
 
         .minute-label {
             font-weight: 200;
             opacity: 0.6;
+            /* Recess it down near the glass surface */
+            filter: drop-shadow(-0.2vmin 0.4vmin 0.5vmin rgba(0, 0, 0, 0.04));
+            z-index: 11;
         }
 
         /* Premium Solid Hands */
@@ -154,18 +174,20 @@
             background: var(--text-color);
             border-radius: 10vmin;
             z-index: 100;
-            box-shadow: 0 1vmin 2vmin rgba(0, 0, 0, 0.04);
+            box-shadow:
+                -1vmin 1vmin 1.5vmin rgba(0, 0, 0, 0.1),
+                0 0 0.2vmin rgba(0, 0, 0, 0.2);
         }
 
         .hand.hour {
             width: 1.1vmin;
-            height: 26vmin;
+            height: 21vmin;
             z-index: 101;
         }
 
         .hand.minute {
             width: 0.8vmin;
-            height: 38vmin;
+            height: 34vmin;
             opacity: 0.9;
             z-index: 100;
         }
@@ -177,12 +199,10 @@
             z-index: 150;
             transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.5);
             box-shadow:
-                0 0 0.5vmin rgba(255, 59, 48, 0.8),
+                0 0 0.2vmin rgba(255, 59, 48, 0.6),
                 /* Tight laser core */
-                0 0 2vmin rgba(255, 59, 48, 0.4),
-                /* Medium bloom */
-                0 0 5vmin rgba(255, 59, 48, 0.1);
-            /* Wide atmospheric glow */
+                0 0 0.8vmin rgba(255, 59, 48, 0.15);
+            /* Subtle natural glow */
         }
 
         /* Multi-tier Engineering Center Pin */
@@ -193,12 +213,13 @@
             left: 50%;
             width: 2.6vmin;
             height: 2.6vmin;
-            background: var(--face-color);
-            border: 0.5vmin solid var(--text-color);
+            background: linear-gradient(145deg, #ffffff, #d9d9d9);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             z-index: 1999;
-            box-shadow: inset 0 0.2vmin 0.5vmin rgba(0, 0, 0, 0.05);
+            box-shadow:
+                -0.5vmin 0.5vmin 1vmin rgba(0, 0, 0, 0.15),
+                inset 0.2vmin 0.2vmin 0.5vmin rgba(255, 255, 255, 0.8);
         }
 
         #clock-bezel::after {
@@ -212,7 +233,9 @@
             border-radius: 50%;
             transform: translate(-50%, -50%);
             z-index: 2001;
-            box-shadow: 0 0.2vmin 0.5vmin rgba(255, 59, 48, 0.3);
+            box-shadow:
+                -0.2vmin 0.2vmin 0.5vmin rgba(0, 0, 0, 0.2),
+                inset 0.1vmin 0.1vmin 0.2vmin rgba(255, 255, 255, 0.5);
         }
     </style>
 </head>
@@ -245,14 +268,14 @@
         let hTargetX = 0, hTargetY = 0;
         let mTargetX = 0, mTargetY = 0;
 
-        const RADIUS = 32;
+        const RADIUS = 28.5; // Adjusted to a middle ground for better spacing
 
         function getSafeXY(fixedX, fixedY) {
             let angle = Math.random() * Math.PI * 2;
             let x = Math.cos(angle) * RADIUS;
             let y = Math.sin(angle) * RADIUS;
             const dist = Math.sqrt((x - fixedX) ** 2 + (y - fixedY) ** 2);
-            if (dist < 30) return getSafeXY(fixedX, fixedY);
+            if (dist < 23) return getSafeXY(fixedX, fixedY);
             return { x, y };
         }
 
@@ -315,21 +338,39 @@
                 trailsM.forEach(t => t.textContent = String(lastMilestone).padStart(2, '0'));
             }
 
-            const rectH = hLabelEl.getBoundingClientRect();
-            const rectM = mLabelEl.getBoundingClientRect();
-            const rectC = document.getElementById('clock-bezel').getBoundingClientRect();
-
-            const centerX = rectC.left + rectC.width / 2;
-            const centerY = rectC.top + rectC.height / 2;
-
-            const baseHAngle = Math.atan2((rectH.top + rectH.height / 2) - centerY, (rectH.left + rectH.width / 2) - centerX) * 180 / Math.PI + 90;
-            const baseMAngle = Math.atan2((rectM.top + rectM.height / 2) - centerY, (rectM.left + rectM.width / 2) - centerX) * 180 / Math.PI + 90;
+            // Use target coordinates directly to calculate the true final angle the hands are seeking
+            const finalBaseHAngle = Math.atan2(hTargetY, hTargetX) * 180 / Math.PI + 90;
+            const finalBaseMAngle = Math.atan2(mTargetY, mTargetX) * 180 / Math.PI + 90;
 
             const hOffset = (m / 60) * 30 + (s / 3600) * 30;
             const mOffset = (m - lastMilestone) * 6 + (s / 60) * 6;
 
-            document.querySelector('.hand.hour').style.transform = `translateX(-50%) rotate(${baseHAngle + hOffset}deg)`;
-            document.querySelector('.hand.minute').style.transform = `translateX(-50%) rotate(${baseMAngle + mOffset}deg)`;
+            let targetH = finalBaseHAngle + hOffset;
+            let targetM = finalBaseMAngle + mOffset;
+
+            // Initialize global hand rotations if they don't exist
+            if (window.rotH === undefined) {
+                window.rotH = targetH;
+                window.rotM = targetM;
+            } else {
+                // Determine shortest positive (clockwise) distance to target
+                let diffH = (targetH - window.rotH) % 360;
+                if (diffH < 0) diffH += 360;
+
+                let diffM = (targetM - window.rotM) % 360;
+                if (diffM < 0) diffM += 360;
+
+                // Protect against tiny backwards floating point jitter (preventing full 360 resets)
+                if (diffH > 359.5) diffH = 0;
+                if (diffM > 359.5) diffM = 0;
+
+                // Smoothly sweep clockwise towards the destination (reduced speed by 50%)
+                window.rotH += diffH * 0.02;
+                window.rotM += diffM * 0.02;
+            }
+
+            document.querySelector('.hand.hour').style.transform = `translateX(-50%) rotate(${window.rotH}deg)`;
+            document.querySelector('.hand.minute').style.transform = `translateX(-50%) rotate(${window.rotM}deg)`;
 
             if (s !== lastSecond) {
                 const diff = (s - lastSecond + 60) % 60;
