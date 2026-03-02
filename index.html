@@ -204,7 +204,7 @@
                 0 0 2vmin var(--accent-color);
         }
 
-        /* Glass Center Pin */
+        /* Multi-tier Engineering Center Pin */
         #clock-bezel::before {
             content: '';
             position: absolute;
@@ -212,13 +212,13 @@
             left: 50%;
             width: 2.6vmin;
             height: 2.6vmin;
-            background: rgba(255, 255, 255, 0.8);
+            background: linear-gradient(145deg, #ffffff, #d9d9d9);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             z-index: 1999;
             box-shadow:
-                0 0.5vmin 1vmin rgba(0, 0, 0, 0.2),
-                inset 0 0.2vmin 0.5vmin rgba(255, 255, 255, 1);
+                -0.5vmin 0.5vmin 1vmin rgba(0, 0, 0, 0.15),
+                inset 0.2vmin 0.2vmin 0.5vmin rgba(255, 255, 255, 0.8);
         }
 
         #clock-bezel::after {
