@@ -105,16 +105,19 @@
         }
 
         /* Only show trails during the active drift */
-        .is-drifting .trail {
+        .is-h-drifting .h-trail,
+        .is-m-drifting .m-trail {
             opacity: 0.15;
             transition: transform 5s var(--reality-ease), opacity 0.5s ease;
         }
 
-        .is-drifting .trail-1 {
+        .is-h-drifting .h-trail-1,
+        .is-m-drifting .m-trail-1 {
             transition-duration: 5.8s;
         }
 
-        .is-drifting .trail-2 {
+        .is-h-drifting .h-trail-2,
+        .is-m-drifting .m-trail-2 {
             transition-duration: 6.5s;
         }
 
@@ -285,32 +288,40 @@
             hTargetY = Math.sin(hAngle) * RADIUS;
 
             const mPos = getSafeXY(hTargetX, hTargetY);
-            mTargetX = mPos.x;
-            mTargetY = mPos.y;
 
-            // Trigger "Drifting" state
             const bezel = document.getElementById('clock-bezel');
-            bezel.classList.add('is-drifting');
 
-            // Apply linear drift to main labels and their trails
-            const targets = [
-                'h-label', 'h-trail-1', 'h-trail-2',
-                'm-label', 'm-trail-1', 'm-trail-2'
-            ];
-
-            targets.forEach(id => {
-                const isH = id.startsWith('h');
-                const tx = isH ? hTargetX : mTargetX;
-                const ty = isH ? hTargetY : mTargetY;
-                document.getElementById(id).style.transform = `translate3d(calc(-50% + ${tx}vmin), calc(-50% + ${ty}vmin), 0)`;
+            // 1. Shift Hour
+            bezel.classList.add('is-h-drifting');
+            const hTargets = ['h-label', 'h-trail-1', 'h-trail-2'];
+            hTargets.forEach(id => {
+                document.getElementById(id).style.transform = `translate3d(calc(-50% + ${hTargetX}vmin), calc(-50% + ${hTargetY}vmin), 0)`;
             });
 
-            // Return to "Resting State" after transit (5 seconds)
             setTimeout(() => {
-                bezel.classList.remove('is-drifting');
+                bezel.classList.remove('is-h-drifting');
             }, 5000);
 
-            setTimeout(shiftReality, 7000 + Math.random() * 8000); // Slightly longer gap to allow resting
+            // 2. Shift Minute after a detached, random delay (1.5 to 4 seconds later)
+            const mDelay = 1500 + Math.random() * 2500;
+            setTimeout(() => {
+                mTargetX = mPos.x;
+                mTargetY = mPos.y;
+
+                bezel.classList.add('is-m-drifting');
+                const mTargets = ['m-label', 'm-trail-1', 'm-trail-2'];
+                mTargets.forEach(id => {
+                    document.getElementById(id).style.transform = `translate3d(calc(-50% + ${mTargetX}vmin), calc(-50% + ${mTargetY}vmin), 0)`;
+                });
+
+                setTimeout(() => {
+                    bezel.classList.remove('is-m-drifting');
+                }, 5000);
+
+            }, mDelay);
+
+            // Reschedule next shift cycle (wait for both to finish + resting time)
+            setTimeout(shiftReality, mDelay + 7000 + Math.random() * 8000);
         }
 
         function update() {
