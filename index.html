@@ -12,7 +12,8 @@
         :root {
             --bg-color: #fcfcfc;
             --face-color: #ffffff;
-            --text-color: #1a1a1a;
+            --text-color: #242426;
+            /* Softer modern dark gray */
             --accent-color: #ff3b30;
             --clock-size: 75vmin;
             --label-size: 8vmin;
@@ -91,34 +92,15 @@
             align-items: center;
             justify-content: center;
             opacity: 0;
-            transition: transform 5s var(--reality-ease), opacity 1s ease;
+            transition: opacity 3s ease;
             filter: blur(1px);
-        }
-
-        /* Staggered lag for trails */
-        .trail-1 {
-            transition-duration: 5.8s;
-        }
-
-        .trail-2 {
-            transition-duration: 6.5s;
         }
 
         /* Only show trails during the active drift */
         .is-h-drifting .h-trail,
         .is-m-drifting .m-trail {
             opacity: 0.15;
-            transition: transform 5s var(--reality-ease), opacity 0.5s ease;
-        }
-
-        .is-h-drifting .h-trail-1,
-        .is-m-drifting .m-trail-1 {
-            transition-duration: 5.8s;
-        }
-
-        .is-h-drifting .h-trail-2,
-        .is-m-drifting .m-trail-2 {
-            transition-duration: 6.5s;
+            transition: opacity 0.5s ease;
         }
 
         /* Ensure trial font matches labels */
@@ -136,7 +118,7 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transition: transform 5.0s var(--reality-ease);
+            transition: opacity 3s ease, filter 3s ease;
             font-size: var(--label-size);
             color: var(--text-color);
             white-space: nowrap;
@@ -168,6 +150,22 @@
             z-index: 11;
         }
 
+        /* Ghosting Effect during Drift */
+        .is-h-drifting .hour-label,
+        .is-m-drifting .minute-label {
+            opacity: 0.03;
+            filter: blur(4px);
+            transition: opacity 2s ease, filter 2s ease;
+        }
+
+        /* Apply ghosting to hands */
+        .is-h-drifting .hand.hour,
+        .is-m-drifting .hand.minute {
+            opacity: 0.03;
+            filter: blur(3px);
+            transition: opacity 2s ease, filter 2s ease;
+        }
+
         /* Premium Solid Hands */
         .hand {
             position: absolute;
@@ -177,6 +175,7 @@
             background: var(--text-color);
             border-radius: 10vmin;
             z-index: 100;
+            transition: opacity 3s ease, filter 3s ease;
             box-shadow:
                 -1vmin 1vmin 1.5vmin rgba(0, 0, 0, 0.1),
                 0 0 0.2vmin rgba(0, 0, 0, 0.2);
@@ -284,44 +283,53 @@
 
         function shiftReality() {
             const hAngle = Math.random() * Math.PI * 2;
-            hTargetX = Math.cos(hAngle) * RADIUS;
-            hTargetY = Math.sin(hAngle) * RADIUS;
+            const newHTargetX = Math.cos(hAngle) * RADIUS;
+            const newHTargetY = Math.sin(hAngle) * RADIUS;
 
-            const mPos = getSafeXY(hTargetX, hTargetY);
+            const mPos = getSafeXY(newHTargetX, newHTargetY);
 
             const bezel = document.getElementById('clock-bezel');
 
+            // Initialize position immediately on first load without fading
+            if (hTargetX === 0 && hTargetY === 0) {
+                hTargetX = newHTargetX;
+                hTargetY = newHTargetY;
+                mTargetX = mPos.x;
+                mTargetY = mPos.y;
+                setTimeout(shiftReality, 2000 + Math.random() * 3000);
+                return;
+            }
+
             // 1. Shift Hour
             bezel.classList.add('is-h-drifting');
-            const hTargets = ['h-label', 'h-trail-1', 'h-trail-2'];
-            hTargets.forEach(id => {
-                document.getElementById(id).style.transform = `translate3d(calc(-50% + ${hTargetX}vmin), calc(-50% + ${hTargetY}vmin), 0)`;
-            });
+
+            setTimeout(() => {
+                hTargetX = newHTargetX;
+                hTargetY = newHTargetY;
+            }, 2000);
 
             setTimeout(() => {
                 bezel.classList.remove('is-h-drifting');
-            }, 5000);
+            }, 10000);
 
             // 2. Shift Minute after a detached, random delay (1.5 to 4 seconds later)
-            const mDelay = 1500 + Math.random() * 2500;
+            const mDelay = 2000 + Math.random() * 2500;
             setTimeout(() => {
-                mTargetX = mPos.x;
-                mTargetY = mPos.y;
-
                 bezel.classList.add('is-m-drifting');
-                const mTargets = ['m-label', 'm-trail-1', 'm-trail-2'];
-                mTargets.forEach(id => {
-                    document.getElementById(id).style.transform = `translate3d(calc(-50% + ${mTargetX}vmin), calc(-50% + ${mTargetY}vmin), 0)`;
-                });
+
+                setTimeout(() => {
+                    mTargetX = mPos.x;
+                    mTargetY = mPos.y;
+                }, 2000);
 
                 setTimeout(() => {
                     bezel.classList.remove('is-m-drifting');
-                }, 5000);
+                }, 10000);
 
             }, mDelay);
 
             // Reschedule next shift cycle (wait for both to finish + resting time)
-            setTimeout(shiftReality, mDelay + 7000 + Math.random() * 8000);
+            setTimeout(shiftReality, mDelay + 12000 + Math.random() * 8000);
         }
 
         function update() {
@@ -376,25 +384,45 @@
             if (window.rotH === undefined) {
                 window.rotH = targetH;
                 window.rotM = targetM;
-            } else {
-                // Determine shortest positive (clockwise) distance to target
-                let diffH = (targetH - window.rotH) % 360;
-                if (diffH < 0) diffH += 360;
-
-                let diffM = (targetM - window.rotM) % 360;
-                if (diffM < 0) diffM += 360;
-
-                // Protect against tiny backwards floating point jitter (preventing full 360 resets)
-                if (diffH > 359.5) diffH = 0;
-                if (diffM > 359.5) diffM = 0;
-
-                // Smoothly sweep clockwise towards the destination (reduced speed by 50%)
-                window.rotH += diffH * 0.02;
-                window.rotM += diffM * 0.02;
+                window.rotHT1 = targetH;
+                window.rotHT2 = targetH;
+                window.rotMT1 = targetM;
+                window.rotMT2 = targetM;
             }
+
+            function sweep(current, target, speed) {
+                let diff = (target - current) % 360;
+                if (diff < 0) diff += 360;
+                if (diff > 359.5) diff = 0;
+                return current + diff * speed;
+            }
+
+            window.rotH = sweep(window.rotH, targetH, 0.01);
+            window.rotM = sweep(window.rotM, targetM, 0.01);
+
+            window.rotHT1 = sweep(window.rotHT1, targetH, 0.0094);
+            window.rotHT2 = sweep(window.rotHT2, targetH, 0.009);
+
+            window.rotMT1 = sweep(window.rotMT1, targetM, 0.0094);
+            window.rotMT2 = sweep(window.rotMT2, targetM, 0.009);
 
             document.querySelector('.hand.hour').style.transform = `translateX(-50%) rotate(${window.rotH}deg)`;
             document.querySelector('.hand.minute').style.transform = `translateX(-50%) rotate(${window.rotM}deg)`;
+
+            function updateLabel(id, rot, offset) {
+                const rad = (rot - offset - 90) * Math.PI / 180;
+                const x = Math.cos(rad) * RADIUS;
+                const y = Math.sin(rad) * RADIUS;
+                document.getElementById(id).style.transform = `translate3d(calc(-50% + ${x}vmin), calc(-50% + ${y}vmin), 0)`;
+            }
+
+            updateLabel('h-label', window.rotH, hOffset);
+            updateLabel('h-trail-1', window.rotHT1, hOffset);
+            updateLabel('h-trail-2', window.rotHT2, hOffset);
+
+            updateLabel('m-label', window.rotM, mOffset);
+            updateLabel('m-trail-1', window.rotMT1, mOffset);
+            updateLabel('m-trail-2', window.rotMT2, mOffset);
 
             if (s !== lastSecond) {
                 const diff = (s - lastSecond + 60) % 60;
