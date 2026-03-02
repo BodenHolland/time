@@ -4,21 +4,19 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Time Orientation — Premium Reality</title>
+    <title>Time Orientation — Stealth Dark Mode</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
         rel="stylesheet" />
     <style>
         :root {
-            --text-color: #ffffff;
-            --accent-color: #ff3b30;
+            --bg-color: #08080a;
+            --face-color: #121214;
+            --text-color: #e0e0e0;
+            --accent-color: #ff2a5f;
             --clock-size: 75vmin;
             --label-size: 8vmin;
             --reality-ease: cubic-bezier(0.16, 1, 0.3, 1);
-
-            /* Dynamic Time Colors */
-            --face-center: #1a1a24;
-            --face-edge: #050508;
         }
 
         html,
@@ -29,45 +27,46 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Bright clean background */
-            background: #fcfcfc;
+            background: var(--bg-color);
             font-family: 'Inter', sans-serif;
             overflow: hidden;
         }
 
-        /* Premium Lighter Milled Metal Bezel */
+        /* Premium Milled Dark Metal Bezel */
         #clock-bezel {
             width: var(--clock-size);
             height: var(--clock-size);
-            border: 0.2vmin solid #b5b5b5;
+            border: 0.2vmin solid #1a1a1c;
+            /* Almost imperceptible edge against deep space background */
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             box-sizing: border-box;
-            background: linear-gradient(135deg, #d8d8d8 0%, #f4f4f4 50%, #b0b0b0 100%);
+            background: linear-gradient(135deg, #2c2c2e 0%, #151515 50%, #0a0a0a 100%);
+            /* Gunmetal finish */
             padding: 1.2vmin;
+            /* Internal machining highlights for dark mode */
             box-shadow:
-                inset 0.3vmin 0.3vmin 0.8vmin rgba(255, 255, 255, 1),
-                inset -0.4vmin -0.4vmin 1.5vmin rgba(0, 0, 0, 0.15),
-                inset 1vmin 1vmin 3vmin rgba(255, 255, 255, 0.4);
+                inset 0.2vmin 0.2vmin 0.5vmin rgba(255, 255, 255, 0.08),
+                inset -0.4vmin -0.4vmin 1.5vmin rgba(0, 0, 0, 0.8),
+                inset 1vmin 1vmin 3vmin rgba(255, 255, 255, 0.02);
             transform: translateZ(0);
         }
 
-        /* Transparent Glass Dial */
+        /* Recessed Dial with Domed Glass Illusion */
         #clock-face {
             width: 100%;
             height: 100%;
             position: relative;
             border-radius: 50%;
-            /* Dynamically driven by JS time progression */
-            background: radial-gradient(circle at 30% 30%, var(--face-center) 0%, var(--face-edge) 100%);
+            background: radial-gradient(circle at 30% 30%, #1c1c1f 0%, #08080a 100%);
+            /* Bezel lip shadow casting downwards, plus extreme concavity depth */
             box-shadow:
-                inset 0 0 4vmin rgba(255, 255, 255, 0.1),
-                inset 2vmin 2vmin 5vmin rgba(0, 0, 0, 0.4);
-            transition: background 1s linear;
-            /* Smooth micro-transitions */
+                0.3vmin 0.5vmin 1.5vmin rgba(0, 0, 0, 0.8),
+                inset 2vmin 2vmin 5vmin rgba(0, 0, 0, 0.6),
+                inset -1vmin -1vmin 3vmin rgba(255, 255, 255, 0.03);
         }
 
         /* Viscous Trail Elements */
@@ -133,16 +132,16 @@
         .hour-label {
             font-weight: 500;
             font-size: calc(var(--label-size) * 1.15);
-            /* Drop shadow to float above the mesh */
-            filter: drop-shadow(0 1vmin 1.5vmin rgba(0, 0, 0, 0.25));
+            /* Make it float noticeably higher with a darker shadow */
+            filter: drop-shadow(-1vmin 1.5vmin 1.5vmin rgba(0, 0, 0, 0.6));
             z-index: 12;
         }
 
         .minute-label {
             font-weight: 200;
-            opacity: 0.8;
-            /* Recess it slightly */
-            filter: drop-shadow(0 0.5vmin 1vmin rgba(0, 0, 0, 0.15));
+            opacity: 0.6;
+            /* Recess it down near the glass surface */
+            filter: drop-shadow(-0.2vmin 0.4vmin 0.5vmin rgba(0, 0, 0, 0.3));
             z-index: 11;
         }
 
@@ -168,29 +167,26 @@
             left: 50%;
             bottom: 50%;
             transform-origin: 50% 100%;
+            background: var(--text-color);
             border-radius: 10vmin;
             z-index: 100;
             transition: opacity 3s ease, filter 3s ease;
             box-shadow:
-                0 1vmin 2vmin rgba(0, 0, 0, 0.2),
-                inset 0 0 0.5vmin rgba(255, 255, 255, 0.8);
+                -1vmin 1vmin 1.5vmin rgba(0, 0, 0, 0.5),
+                0 0 0.2vmin rgba(0, 0, 0, 0.8);
         }
 
         .hand.hour {
             width: 1.1vmin;
             height: 21vmin;
-            background: var(--text-color);
             z-index: 101;
-            box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
         }
 
         .hand.minute {
             width: 0.8vmin;
             height: 34vmin;
-            background: var(--text-color);
-            opacity: 0.8;
+            opacity: 0.9;
             z-index: 100;
-            box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.3);
         }
 
         .hand.second {
@@ -199,12 +195,13 @@
             background: var(--accent-color);
             z-index: 150;
             transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.5);
+            /* Glowing neon laser */
             box-shadow:
-                0 0 1vmin var(--accent-color),
-                0 0 2vmin var(--accent-color);
+                0 0 0.5vmin rgba(255, 42, 95, 0.8),
+                0 0 1.5vmin rgba(255, 42, 95, 0.4);
         }
 
-        /* Glass Center Pin */
+        /* Multi-tier Engineering Center Pin */
         #clock-bezel::before {
             content: '';
             position: absolute;
@@ -212,13 +209,13 @@
             left: 50%;
             width: 2.6vmin;
             height: 2.6vmin;
-            background: rgba(255, 255, 255, 0.8);
+            background: linear-gradient(145deg, #44444a, #111111);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             z-index: 1999;
             box-shadow:
-                0 0.5vmin 1vmin rgba(0, 0, 0, 0.2),
-                inset 0 0.2vmin 0.5vmin rgba(255, 255, 255, 1);
+                -0.5vmin 0.5vmin 1vmin rgba(0, 0, 0, 0.6),
+                inset 0.2vmin 0.2vmin 0.5vmin rgba(255, 255, 255, 0.15);
         }
 
         #clock-bezel::after {
@@ -233,7 +230,9 @@
             transform: translate(-50%, -50%);
             z-index: 2001;
             box-shadow:
-                0 0 0.8vmin var(--accent-color);
+                -0.2vmin 0.2vmin 0.5vmin rgba(0, 0, 0, 0.8),
+                0 0 0.8vmin var(--accent-color),
+                inset 0.1vmin 0.1vmin 0.2vmin rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
@@ -259,33 +258,6 @@
     </div>
 
     <script>
-        // Define the 24-hour color gradient progression for the clock dial
-        const timePalettes = [
-            { center: '#1a1a24', edge: '#050508', text: '#e0e0e0' }, // 0: Midnight
-            { center: '#1a1c29', edge: '#060811', text: '#e0e0e0' }, // 1: Deep Night
-            { center: '#1b2236', edge: '#080d1c', text: '#e0e0e0' }, // 2: Deep Night
-            { center: '#222b42', edge: '#0b1325', text: '#e0e0e0' }, // 3: Very early
-            { center: '#2d3b5e', edge: '#111b33', text: '#e0e0e0' }, // 4: Dawn approaches
-            { center: '#4c4e7a', edge: '#1c1b3b', text: '#eaeaea' }, // 5: Dawn
-            { center: '#ffb97b', edge: '#8b3a58', text: '#2a1a1a' }, // 6: Sunrise
-            { center: '#f4e2d8', edge: '#e09886', text: '#1a1a1a' }, // 7: Early Morning 
-            { center: '#d1ebfa', edge: '#85bbd9', text: '#133a4f' }, // 8: Morning
-            { center: '#c1e5fc', edge: '#6facd3', text: '#11354a' }, // 9: Mid-Morning
-            { center: '#bde2fd', edge: '#58a0d0', text: '#0e2b3c' }, // 10: Late Morning
-            { center: '#e4f3ff', edge: '#81bdea', text: '#0f2f42' }, // 11: Noon roughly
-            { center: '#ffffff', edge: '#a4cdef', text: '#163f59' }, // 12: Noon
-            { center: '#f5fbff', edge: '#8bbfe5', text: '#143b54' }, // 13: Midday
-            { center: '#eaf4fc', edge: '#76b1db', text: '#113349' }, // 14: Midday
-            { center: '#fcf3e3', edge: '#bba27e', text: '#3c2c19' }, // 15: Afternoon
-            { center: '#ffdfb3', edge: '#d39255', text: '#4a2d14' }, // 16: Late Afternoon
-            { center: '#ffae6b', edge: '#e05929', text: '#4d1e0d' }, // 17: Golden Hour
-            { center: '#ff7e5f', edge: '#8f2336', text: '#fafafa' }, // 18: Sunset 
-            { center: '#8a4067', edge: '#291b3d', text: '#f0f0f0' }, // 19: Dusk
-            { center: '#413c6b', edge: '#16142e', text: '#d0d0d0' }, // 20: Blue Hour
-            { center: '#2b2c4e', edge: '#0e0e1a', text: '#d0d0d0' }, // 21: Night
-            { center: '#202138', edge: '#090912', text: '#e0e0e0' }, // 22: Late Night
-            { center: '#1a1b2b', edge: '#06060c', text: '#e0e0e0' }  // 23: Night
-        ];
 
         let lastMilestone = -1;
         let lastSecond = -1;
@@ -403,17 +375,6 @@
 
             let targetH = finalBaseHAngle + hOffset;
             let targetM = finalBaseMAngle + mOffset;
-
-            // Interpolate dynamic daylight colors!
-            // We use the exact fractional progress of the current hour to blend smoothly into the next hour's target color
-            const ms = now.getMilliseconds();
-            const progress = (m * 60 * 1000 + s * 1000 + ms) / (60 * 60 * 1000);
-            const cp = timePalettes[h];
-            const np = timePalettes[(h + 1) % 24];
-
-            document.documentElement.style.setProperty('--face-center', `color-mix(in srgb, ${np.center} ${progress * 100}%, ${cp.center})`);
-            document.documentElement.style.setProperty('--face-edge', `color-mix(in srgb, ${np.edge} ${progress * 100}%, ${cp.edge})`);
-            document.documentElement.style.setProperty('--text-color', `color-mix(in srgb, ${np.text} ${progress * 100}%, ${cp.text})`);
 
             // Initialize global hand rotations if they don't exist
             if (window.rotH === undefined) {
