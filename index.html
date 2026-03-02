@@ -320,7 +320,11 @@
             const s = now.getSeconds();
 
             const displayH = h % 12 || 12;
-            const mMilestone = Math.floor((m - 3 < 0 ? 0 : m - 3) / 5) * 5;
+
+            // Ensure the minute reference is always at least 3 minutes behind the hand
+            let effectiveM = m - 3;
+            if (effectiveM < 0) effectiveM += 60; // Wraparound securely
+            const mMilestone = Math.floor(effectiveM / 5) * 5;
 
             const hLabelEl = document.getElementById('h-label');
             const mLabelEl = document.getElementById('m-label');
@@ -334,8 +338,17 @@
 
             if (mMilestone !== lastMilestone) {
                 lastMilestone = mMilestone;
-                mLabelEl.textContent = String(lastMilestone).padStart(2, '0');
-                trailsM.forEach(t => t.textContent = String(lastMilestone).padStart(2, '0'));
+
+                // Only 5 gets a prefixed zero '05'. 0 is just '0'.
+                let displayM = String(lastMilestone);
+                if (lastMilestone === 5) {
+                    displayM = '05';
+                } else if (lastMilestone === 0) {
+                    displayM = '0';
+                }
+
+                mLabelEl.textContent = displayM;
+                trailsM.forEach(t => t.textContent = displayM);
             }
 
             // Use target coordinates directly to calculate the true final angle the hands are seeking
