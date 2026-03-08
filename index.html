@@ -42,9 +42,12 @@
             height: var(--clock-size);
             border-radius: 50%;
             box-shadow:
-                /* Outer soft drop shadow tinted by upcoming accent color */
-                0 3vmin 8vmin color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 15%, rgba(0, 0, 0, 0.12)),
-                0 1vmin 3vmin color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 5%, rgba(0, 0, 0, 0.04));
+                /* Guaranteed neutral umbra — always visible against white page */
+                0 4vmin 10vmin rgba(0, 0, 0, 0.18),
+                0 1.5vmin 4vmin rgba(0, 0, 0, 0.10),
+                /* Accent-tinted layer on top for color anticipation */
+                0 3vmin 8vmin color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 12%, transparent),
+                0 1vmin 3vmin color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 5%, transparent);
             transform: scale(1) translateZ(0);
             transition: box-shadow 1s linear;
         }
@@ -77,8 +80,8 @@
                 /* Dark index of refraction rim */
                 inset -0.4vmin -0.4vmin 1.5vmin rgba(0, 0, 0, 0.1);
 
-            /* Crisp outer border slightly tinted by the upcoming color */
-            border: 0.15vmin solid color-mix(in srgb, var(--next-accent, rgba(255, 255, 255, 1)) 30%, rgba(255, 255, 255, 0.5));
+            /* Crisp outer border — always slightly dark so it never bleaches against white page */
+            border: 0.15vmin solid color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 20%, rgba(0, 0, 0, 0.20));
 
             /* Reverting scale to 1 to allow the clock to take up exactly 75% of the viewport 
                (as dictated by the base --clock-size of 75vmin), retaining the soft shadow. */
