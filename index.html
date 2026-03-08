@@ -425,27 +425,35 @@
             mTargetY = mPos.y;
         }
 
-        // Trigger one drift cycle — both labels ghost and move simultaneously
-        // Trigger one drift cycle — labels and trails blur while drifting to new locations
-        function triggerOneDrift() {
-            const hAngle = Math.random() * Math.PI * 2;
-            const newHTargetX = Math.cos(hAngle) * RADIUS;
-            const newHTargetY = Math.sin(hAngle) * RADIUS;
-            const mPos = getSafeXY(newHTargetX, newHTargetY);
+        // Logic to trigger a drift for a specific hand (hour or minute)
+        function triggerHandDrift(type) {
+            const isH = type === 'hour';
+            const driftingClass = isH ? 'is-h-drifting' : 'is-m-drifting';
 
-            // Apply drifting classes to body for global style hooks
-            document.body.classList.add('is-h-drifting', 'is-m-drifting');
+            // 1. Ghost out
+            document.body.classList.add(driftingClass);
 
+            // 2. Wait for ghosting to peak, then update target
             setTimeout(() => {
-                hTargetX = newHTargetX;
-                hTargetY = newHTargetY;
-                mTargetX = mPos.x;
-                mTargetY = mPos.y;
+                const angle = Math.random() * Math.PI * 2;
+                const targetX = Math.cos(angle) * RADIUS;
+                const targetY = Math.sin(angle) * RADIUS;
+
+                if (isH) {
+                    hTargetX = targetX;
+                    hTargetY = targetY;
+                } else {
+                    const mPos = getSafeXY(targetX, targetY);
+                    mTargetX = mPos.x;
+                    mTargetY = mPos.y;
+                }
             }, 2000);
 
+            // 3. Keep ghosted while "sailing" to new spot 
+            // (The sweep speed 0.01 takes roughly 8-10s to fully settle)
             setTimeout(() => {
-                document.body.classList.remove('is-h-drifting', 'is-m-drifting');
-            }, 10000);
+                document.body.classList.remove(driftingClass);
+            }, 12000);
         }
 
         /**
@@ -909,16 +917,23 @@
         shiftReality();
         update();
 
-        // ─── Production: Frequent stochastic drifts (10-15 seconds) ───
-        function scheduleNextProductionDrift() {
-            const minMs = 10 * 1000;
-            const randomAddMs = Math.random() * 5 * 1000;
+        // ─── Production: Independent Hour & Minute drifts ───
+        // Dwell time (10-15s) happens AFTER the transition (12s) finishes.
+        function scheduleDriftLoop(type) {
+            const transitionDuration = 12000;
+            const minDwell = 10000;
+            const randomDwell = Math.random() * 5000;
+
             setTimeout(() => {
-                triggerOneDrift();
-                scheduleNextProductionDrift();
-            }, minMs + randomAddMs);
+                triggerHandDrift(type);
+                // The next cycle starts only after [Transition + Dwell]
+                scheduleDriftLoop(type);
+            }, transitionDuration + minDwell + randomDwell);
         }
-        scheduleNextProductionDrift();
+
+        // Start them offset so they don't both move at the exact same time
+        setTimeout(() => scheduleDriftLoop('hour'), 2000);
+        setTimeout(() => scheduleDriftLoop('minute'), 8000);
     </script>
 </body>
 
