@@ -42,8 +42,8 @@
             height: var(--clock-size);
             border-radius: 50%;
             box-shadow:
-                /* Single even radial bloom — no offset, no banding */
-                0 0 16vmin rgba(0, 0, 0, 0.15);
+                /* Negative spread pulls shadow start inside the edge — no visible ring */
+                0 0 20vmin -3vmin rgba(0, 0, 0, 0.22);
             transform: scale(1) translateZ(0);
             transition: box-shadow 1s linear;
         }
