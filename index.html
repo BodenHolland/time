@@ -508,8 +508,15 @@
             const faceLum = (cr * 0.299 + cg * 0.587 + cb * 0.114) / 255;
             const isLightFace = faceLum > 0.40;
 
-            // At tipL=25%, natural complements of a morning-blue face are warm amber + spring green
-            // — no shifting needed. Only shift was designed for old tipL=8% (where those hues looked muddy).
+            // On light faces: brown/amber (10-65°) and olive-yellow (65-120°) look muddy or dirty.
+            // Shift them to cool sky-blue tones that feel light and daytime instead.
+            if (isLightFace) {
+                if (hourHue >= 10 && hourHue <= 65) hourHue = 205;  // brown → sky blue
+                else if (hourHue > 65 && hourHue <= 120) hourHue = 220; // olive → soft periwinkle
+
+                if (minuteHue >= 10 && minuteHue <= 65) minuteHue = 220; // brown → periwinkle
+                else if (minuteHue > 65 && minuteHue <= 120) minuteHue = 195; // olive → cool teal
+            }
 
             // Light faces: scale hand lightness with face brightness
             // Very bright (7AM warmth, noon, lum>0.80): lighter hands so they feel airy
