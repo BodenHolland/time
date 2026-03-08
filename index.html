@@ -688,7 +688,7 @@
         // ─── Demo state machine ───
         const DWELL_MS = 8000;   // stable color view time per step
         const DRIFT_MS = 13000;  // 10s drift class + 3s return transition = labels fully back
-        const COLOR_DELAY = 1000;   // color change fires 1s into drift (labels fully ghosted at 2s)
+        const COLOR_DELAY = 2000;  // matches label fade-out duration — color fires when fully invisible
 
         // Curated sequence — skips near-identical deep-night hours
         // Night block condensed to 4 representative steps; all daytime shown individually
