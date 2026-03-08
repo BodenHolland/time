@@ -52,7 +52,7 @@
             transition: box-shadow 1s linear;
         }
 
-        /* iOS Vibrant Liquid Glass Bezel with Color Anticipation */
+        /* iOS Vibrant Liquid Glass Bezel — 3D raised convex glass */
         #clock-bezel {
             width: var(--clock-size);
             height: var(--clock-size);
@@ -62,29 +62,27 @@
             justify-content: center;
             position: relative;
             box-sizing: border-box;
-            padding: 1.5vmin;
+            padding: 2vmin;
 
-            /* High blur, high saturation "iOS vibrant" glass infused with the upcoming color shift */
-            /* We use the --next-accent (text color) since it ensures pigment even when the clock face is white */
             background: color-mix(in srgb, var(--next-accent, rgba(255, 255, 255, 1)) 15%, rgba(255, 255, 255, 0.25));
             backdrop-filter: blur(40px) saturate(200%);
             -webkit-backdrop-filter: blur(40px) saturate(200%);
 
             box-shadow:
-                /* Sharp bright rim specular reflection */
-                inset 0.2vmin 0.2vmin 0.6vmin rgba(255, 255, 255, 0.8),
-                /* Soft volumetric bounce light inside the thick glass */
-                inset 1vmin 1vmin 3vmin color-mix(in srgb, var(--next-accent, rgba(255, 255, 255, 1)) 20%, rgba(255, 255, 255, 0.3)),
-                /* Inner sharp edge detail */
-                inset -0.1vmin -0.1vmin 0.3vmin rgba(255, 255, 255, 0.6),
-                /* Dark index of refraction rim */
-                inset -0.4vmin -0.4vmin 1.5vmin rgba(0, 0, 0, 0.1);
+                /* Fine bright edge at very top of the rim — primary specular hit */
+                inset 0.1vmin 0.1vmin 0.2vmin rgba(255, 255, 255, 1),
+                /* Broad top-left highlight — convex glass catching light */
+                inset 0.6vmin 0.6vmin 2vmin rgba(255, 255, 255, 0.85),
+                /* Mid-tone bounce fill tinted by accent */
+                inset 1.5vmin 1.5vmin 4.5vmin color-mix(in srgb, var(--next-accent, rgba(255, 255, 255, 1)) 22%, rgba(255, 255, 255, 0.35)),
+                /* Bottom-right counter-shadow — opposite side of the raised glass */
+                inset -0.6vmin -0.6vmin 2vmin rgba(0, 0, 0, 0.18),
+                /* Deep inner rim darkening for glass thickness illusion */
+                inset -1.2vmin -1.2vmin 4vmin rgba(0, 0, 0, 0.12);
 
-            /* Crisp outer border — always slightly dark so it never bleaches against white page */
+            /* Always-dark border so it never bleaches against white page */
             border: 0.15vmin solid color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 20%, rgba(0, 0, 0, 0.20));
 
-            /* Reverting scale to 1 to allow the clock to take up exactly 75% of the viewport 
-               (as dictated by the base --clock-size of 75vmin), retaining the soft shadow. */
             transform: scale(1) translateZ(0);
             transition: background 1s linear, border 1s linear, box-shadow 1s linear;
         }
