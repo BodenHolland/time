@@ -80,7 +80,7 @@
             border: 0.15vmin solid color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 20%, rgba(0, 0, 0, 0.20));
 
             transform: scale(1) translateZ(0);
-            transition: none;
+            transition: background 7s ease, border 7s ease, box-shadow 7s ease;
         }
 
         /* Color-shifting radial face — from design 3 */
@@ -93,7 +93,7 @@
             box-shadow:
                 inset 0 0 4vmin rgba(255, 255, 255, 0.06),
                 inset 2vmin 2vmin 5vmin rgba(0, 0, 0, 0.2);
-            transition: none;
+            transition: background 7s ease;
             overflow: hidden;
         }
 
@@ -269,7 +269,7 @@
             border-radius: 50%;
             transform: translate(-50%, -50%);
             z-index: 1000;
-            transition: background 1s linear;
+            transition: background 7s ease;
             box-shadow:
                 /* Subtle inner specular — gentle glass edge */
                 inset 0.1vmin 0.1vmin 0.3vmin rgba(255, 255, 255, 0.3),
@@ -341,7 +341,7 @@
 
 <body>
 
-    <div id="version-tag">V6 — Instant</div>
+    <div id="version-tag">V7 — Smooth</div>
     <div id="clock-shadow"></div>
     <div id="demo-time-label"></div>
     <div id="demo-description">
@@ -427,15 +427,15 @@
         }
 
         // Trigger one drift cycle — both labels ghost and move simultaneously
+        // Trigger one drift cycle — labels and trails blur while drifting to new locations
         function triggerOneDrift() {
             const hAngle = Math.random() * Math.PI * 2;
             const newHTargetX = Math.cos(hAngle) * RADIUS;
             const newHTargetY = Math.sin(hAngle) * RADIUS;
             const mPos = getSafeXY(newHTargetX, newHTargetY);
-            const bezel = document.getElementById('clock-bezel');
 
-            // Both labels drift together
-            bezel.classList.add('is-h-drifting', 'is-m-drifting');
+            // Apply drifting classes to body for global style hooks
+            document.body.classList.add('is-h-drifting', 'is-m-drifting');
 
             setTimeout(() => {
                 hTargetX = newHTargetX;
@@ -445,7 +445,7 @@
             }, 2000);
 
             setTimeout(() => {
-                bezel.classList.remove('is-h-drifting', 'is-m-drifting');
+                document.body.classList.remove('is-h-drifting', 'is-m-drifting');
             }, 10000);
         }
 
@@ -806,8 +806,10 @@
             requestAnimationFrame(update);
         }
 
-        // ─── v6 Demo — instant cuts, 4s per step ───
-        const DEMO_STEP_MS = 4000;
+        // ─── Smooth Transition Constants ───
+        const DWELL_MS = 3000;   // Wait at an hour
+        const DRIFT_MS = 7000;   // Time for drift & shift
+        const COLOR_DELAY = 1000; // Blend starts after drift trigger
 
         const demoSteps = [
             { h: 20, label: '10 PM' },
@@ -848,14 +850,33 @@
             el.style.opacity = '1';
         }
 
+        function hideDemoLabel() {
+            document.getElementById('demo-time-label').style.opacity = '0';
+        }
+
         function runDemoStep() {
             window.isDemoActive = true;
             document.body.classList.add('is-demo-active');
             const step = demoSteps[demoStepIdx];
-            applyDemoHour(step.h);
+
+            // Phase 1: dwell — labels visible, color stable
             showDemoLabel(step.label);
-            demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
-            setTimeout(runDemoStep, DEMO_STEP_MS);
+
+            setTimeout(() => {
+                // Phase 2: fade label, trigger drift (labels ghost away)
+                hideDemoLabel();
+                triggerOneDrift();
+
+                // Phase 3: 1s into drift, blend to next palette
+                setTimeout(() => {
+                    demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
+                    applyDemoHour(demoSteps[demoStepIdx].h);
+                }, COLOR_DELAY);
+
+                // Phase 4: drift settles — labels reappear in new color, start next dwell
+                setTimeout(runDemoStep, DRIFT_MS);
+
+            }, DWELL_MS);
         }
 
         shiftReality();
