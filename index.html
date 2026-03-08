@@ -459,18 +459,22 @@
         function vibrantLabelColor(textHex, isHour, faceCenterHex) {
             const { r, g, b } = hexToRgb(textHex);
             const { h, s } = rgbToHsl(r, g, b);
-            const baseHue = s < 8 ? 260 : h;
+            // Low-sat text: use cerulean (200°) rather than deep indigo (260°) — reads as fresh sky not heavy navy
+            const baseHue = s < 8 ? 200 : h;
 
             // Check face brightness
             const fc = hexToRgb(faceCenterHex);
             const faceLum = (fc.r * 0.299 + fc.g * 0.587 + fc.b * 0.114) / 255;
             const isLightFace = faceLum > 0.45;
 
-            // On light faces: deep-but-not-black saturated color so numbers pop without heaviness
-            // On dark faces: bright saturated color so they glow
-            const l = isLightFace
-                ? (isHour ? 40 : 44)
-                : (isHour ? 90 : 85);
+            // On very bright faces (7AM, noon): lighter labels feel airy, not heavy
+            // On moderately light faces: slightly darker for readability
+            // On dark faces: bright saturated glow
+            const l = !isLightFace
+                ? (isHour ? 90 : 85)
+                : faceLum > 0.80
+                    ? (isHour ? 50 : 56)
+                    : (isHour ? 40 : 44);
             return `hsl(${baseHue.toFixed(0)}, 100%, ${l}%)`;
         }
 
