@@ -42,10 +42,8 @@
             height: var(--clock-size);
             border-radius: 50%;
             box-shadow:
-                /* Single smooth neutral shadow — large blur, no banding */
-                0 2vmin 14vmin rgba(0, 0, 0, 0.16),
-                /* Soft accent tint on top for warmth/color */
-                0 2vmin 12vmin color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 10%, transparent);
+                /* Single even radial bloom — no offset, no banding */
+                0 0 16vmin rgba(0, 0, 0, 0.15);
             transform: scale(1) translateZ(0);
             transition: box-shadow 1s linear;
         }
