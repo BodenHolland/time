@@ -504,16 +504,8 @@
             const faceLum = (cr * 0.299 + cg * 0.587 + cb * 0.114) / 255;
             const isLightFace = faceLum > 0.40;
 
-            // NO BROWNS OR MUDDY OLIVES:
-            // When putting dark colors on a light sky, hues between 15° and 110° look like brown or dirty green.
-            // We forcefully shift them into beautiful rich tones instead (crimson or deep indigo).
-            if (isLightFace) {
-                if (hourHue >= 10 && hourHue <= 65) hourHue = 340; // Shift orange-brown to Deep Crimson/Plum
-                else if (hourHue > 65 && hourHue <= 120) hourHue = 250; // Shift muddy olive to Deep Indigo
-
-                if (minuteHue >= 10 && minuteHue <= 65) minuteHue = 340;
-                else if (minuteHue > 65 && minuteHue <= 120) minuteHue = 240;
-            }
+            // At tipL=25%, natural complements of a morning-blue face are warm amber + spring green
+            // — no shifting needed. Only shift was designed for old tipL=8% (where those hues looked muddy).
 
             // Light faces: deep-but-airy hands; dark faces: bright neon glow
             const tipL = isLightFace ? 25 : 85;
@@ -703,8 +695,7 @@
             { h: 6, label: '6 AM' },   // Sunrise
             { h: 7, label: '7 AM' },
             { h: 8, label: '8 AM' },
-            { h: 9, label: '9 AM' },
-            { h: 10, label: '10 AM' },
+            { h: 9, label: '9 AM – 10 AM' }, // Morning sky block
             { h: 11, label: '11 AM' },
             { h: 12, label: '12 PM' },   // Noon
             { h: 13, label: '1 PM' },
