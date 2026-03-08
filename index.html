@@ -76,8 +76,8 @@
                 /* Deep inner rim darkening for glass thickness illusion */
                 inset -1.2vmin -1.2vmin 4vmin rgba(0, 0, 0, 0.12);
 
-            /* Always-dark border so it never bleaches against white page */
-            border: 0.15vmin solid color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 20%, rgba(0, 0, 0, 0.20));
+            /* Lighter, thinner border for a more premium glass edge */
+            border: 0.10vmin solid color-mix(in srgb, var(--current-accent, rgba(0, 0, 0, 1)) 15%, rgba(0, 0, 0, 0.15));
 
             transform: scale(1) translateZ(0);
             transition: background 7s ease, border 7s ease, box-shadow 7s ease;
@@ -415,6 +415,9 @@
         let currentDemoH = 0; // controlled by runDemoStep() state machine
         window.isDemoActive = false; // flag to switch between real-time and demo
 
+        let hTargetX = 0, hTargetY = 0;
+        let mTargetX = 0, mTargetY = 0;
+
         const RADIUS = 28.5;
 
         function getSafeXY(fixedX, fixedY, attempt = 0) {
@@ -433,17 +436,8 @@
             return { x, y };
         }
 
-        // Initial placement only — demo loop drives all subsequent drifts
-        const startH = getSafeXY(100, 100);
-        const startM = getSafeXY(startH.x, startH.y);
-        let hTargetX = startH.x, hTargetY = startH.y;
-        let mTargetX = startM.x, mTargetY = startM.y;
-
-        // Smoothed base angles for labels (removes bounce)
-        window.rotHBase = undefined;
-        window.rotMBase = undefined;
         function shiftReality() {
-            // Initial random placement
+            // Initial placement only — demo loop drives all subsequent drifts
             const hAngle = Math.random() * Math.PI * 2;
             const newHTargetX = Math.cos(hAngle) * RADIUS;
             const newHTargetY = Math.sin(hAngle) * RADIUS;
@@ -758,12 +752,11 @@
             const finalBaseHAngle = Math.atan2(hTargetY, hTargetX) * 180 / Math.PI + 90;
             const finalBaseMAngle = Math.atan2(mTargetY, mTargetX) * 180 / Math.PI + 90;
 
-            // These jump every second; we'll use them for the hand targets
-            const hTimeOffset = (m / 60) * 30 + (s / 3600) * 30;
-            const mTimeOffset = (m - lastMilestone) * 6 + (s / 60) * 6;
+            const hOffset = (m / 60) * 30 + (s / 3600) * 30;
+            const mOffset = (m - lastMilestone) * 6 + (s / 60) * 6;
 
-            let targetH = finalBaseHAngle + hTimeOffset;
-            let targetM = finalBaseMAngle + mTimeOffset;
+            let targetH = finalBaseHAngle + hOffset;
+            let targetM = finalBaseMAngle + mOffset;
 
             // ─── Color logic ───
             // If in demo mode, currentDemoH is controlled by the state machine.
@@ -821,8 +814,6 @@
             if (window.rotH === undefined) {
                 window.rotH = targetH;
                 window.rotM = targetM;
-                window.rotHBase = finalBaseHAngle;
-                window.rotMBase = finalBaseMAngle;
                 window.rotHT1 = targetH;
                 window.rotHT2 = targetH;
                 window.rotMT1 = targetM;
@@ -841,40 +832,32 @@
                 return current + diff * speed;
             }
 
-            // Update hand rotations (includes time offset)
             window.rotH = sweep(window.rotH, targetH, 0.015);
             window.rotM = sweep(window.rotM, targetM, 0.015);
 
-            // Update label base rotations (no time offset = no bounce)
-            window.rotHBase = sweep(window.rotHBase, finalBaseHAngle, 0.015);
-            window.rotMBase = sweep(window.rotMBase, finalBaseMAngle, 0.015);
-
-            // Trails follow the hand at varied speeds
             window.rotHT1 = sweep(window.rotHT1, targetH, 0.012);
             window.rotHT2 = sweep(window.rotHT2, targetH, 0.01);
+
             window.rotMT1 = sweep(window.rotMT1, targetM, 0.012);
             window.rotMT2 = sweep(window.rotMT2, targetM, 0.01);
 
             document.querySelector('.hand.hour').style.transform = `translateX(-50%) rotate(${window.rotH}deg)`;
             document.querySelector('.hand.minute').style.transform = `translateX(-50%) rotate(${window.rotM}deg)`;
 
-            // Exact placement from v5: labels at 28.5vmin
-            function updateLabel(id, rot) {
-                const rad = (rot - 90) * Math.PI / 180;
+            function updateLabel(id, rot, offset) {
+                const rad = (rot - offset - 90) * Math.PI / 180;
                 const x = Math.cos(rad) * RADIUS;
                 const y = Math.sin(rad) * RADIUS;
                 document.getElementById(id).style.transform = `translate3d(calc(-50% + ${x}vmin), calc(-50% + ${y}vmin), 0)`;
             }
 
-            // Numbers stay at the smoothed base anchor (no jitter)
-            updateLabel('h-label', window.rotHBase);
-            updateLabel('m-label', window.rotMBase);
+            updateLabel('h-label', window.rotH, hOffset);
+            updateLabel('h-trail-1', window.rotHT1, hOffset);
+            updateLabel('h-trail-2', window.rotHT2, hOffset);
 
-            // Trails still follow the hand movement for organic blur
-            updateLabel('h-trail-1', window.rotHT1);
-            updateLabel('h-trail-2', window.rotHT2);
-            updateLabel('m-trail-1', window.rotMT1);
-            updateLabel('m-trail-2', window.rotMT2);
+            updateLabel('m-label', window.rotM, mOffset);
+            updateLabel('m-trail-1', window.rotMT1, mOffset);
+            updateLabel('m-trail-2', window.rotMT2, mOffset);
 
             if (s !== lastSecond) {
                 const diff = (s - lastSecond + 60) % 60;
