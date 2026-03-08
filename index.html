@@ -690,16 +690,16 @@
         }
 
         // ─── Demo state machine ───
-        const DWELL_MS = 5000;   // stable view time per step
+        const DWELL_MS = 8000;   // stable color view time per step
         const DRIFT_MS = 13000;  // 10s drift class + 3s return transition = labels fully back
         const COLOR_DELAY = 1000;   // color change fires 1s into drift (labels fully ghosted at 2s)
 
         // Curated sequence — skips near-identical deep-night hours
         // Night block condensed to 4 representative steps; all daytime shown individually
         const demoSteps = [
-            { h: 20, label: '10 PM' },   // Evening blue
-            { h: 23, label: 'Midnight' }, // Deep night representative
-            { h: 3, label: '3 AM' },   // Pre-dawn
+            { h: 20, label: '10 PM' },         // Evening
+            { h: 23, label: '11 PM – 2 AM' },   // Deep night block
+            { h: 3, label: '2 AM – 5 AM' },   // Pre-dawn block
             { h: 5, label: '5 AM' },   // Dawn violet
             { h: 6, label: '6 AM' },   // Sunrise
             { h: 7, label: '7 AM' },
