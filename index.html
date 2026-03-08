@@ -415,9 +415,6 @@
         let currentDemoH = 0; // controlled by runDemoStep() state machine
         window.isDemoActive = false; // flag to switch between real-time and demo
 
-        let hTargetX = 0, hTargetY = 0;
-        let mTargetX = 0, mTargetY = 0;
-
         const RADIUS = 28.5;
 
         function getSafeXY(fixedX, fixedY, attempt = 0) {
@@ -435,6 +432,12 @@
             }
             return { x, y };
         }
+
+        // Initialize with distinct random targets immediately to prevent initial stacking
+        const startH = getSafeXY(100, 100); // Away from center
+        const startM = getSafeXY(startH.x, startH.y);
+        let hTargetX = startH.x, hTargetY = startH.y;
+        let mTargetX = startM.x, mTargetY = startM.y;
 
         function shiftReality() {
             // Initial placement only — demo loop drives all subsequent drifts
@@ -752,11 +755,12 @@
             const finalBaseHAngle = Math.atan2(hTargetY, hTargetX) * 180 / Math.PI + 90;
             const finalBaseMAngle = Math.atan2(mTargetY, mTargetX) * 180 / Math.PI + 90;
 
-            const hOffset = (m / 60) * 30 + (s / 3600) * 30;
-            const mOffset = (m - lastMilestone) * 6 + (s / 60) * 6;
+            // These jump every second; we'll use them for the hand targets
+            const hTimeOffset = (m / 60) * 30 + (s / 3600) * 30;
+            const mTimeOffset = (m - lastMilestone) * 6 + (s / 60) * 6;
 
-            let targetH = finalBaseHAngle + hOffset;
-            let targetM = finalBaseMAngle + mOffset;
+            let targetH = finalBaseHAngle + hTimeOffset;
+            let targetM = finalBaseMAngle + mTimeOffset;
 
             // ─── Color logic ───
             // If in demo mode, currentDemoH is controlled by the state machine.
@@ -844,20 +848,21 @@
             document.querySelector('.hand.hour').style.transform = `translateX(-50%) rotate(${window.rotH}deg)`;
             document.querySelector('.hand.minute').style.transform = `translateX(-50%) rotate(${window.rotM}deg)`;
 
-            function updateLabel(id, rot, offset) {
-                const rad = (rot - offset - 90) * Math.PI / 180;
+            // Pin labels directly to smoothed hand rotations (fixes bounce)
+            function updateLabel(id, rot) {
+                const rad = (rot - 90) * Math.PI / 180;
                 const x = Math.cos(rad) * RADIUS;
                 const y = Math.sin(rad) * RADIUS;
                 document.getElementById(id).style.transform = `translate3d(calc(-50% + ${x}vmin), calc(-50% + ${y}vmin), 0)`;
             }
 
-            updateLabel('h-label', window.rotH, hOffset);
-            updateLabel('h-trail-1', window.rotHT1, hOffset);
-            updateLabel('h-trail-2', window.rotHT2, hOffset);
+            updateLabel('h-label', window.rotH);
+            updateLabel('h-trail-1', window.rotHT1);
+            updateLabel('h-trail-2', window.rotHT2);
 
-            updateLabel('m-label', window.rotM, mOffset);
-            updateLabel('m-trail-1', window.rotMT1, mOffset);
-            updateLabel('m-trail-2', window.rotMT2, mOffset);
+            updateLabel('m-label', window.rotM);
+            updateLabel('m-trail-1', window.rotMT1);
+            updateLabel('m-trail-2', window.rotMT2);
 
             if (s !== lastSecond) {
                 const diff = (s - lastSecond + 60) % 60;
