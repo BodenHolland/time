@@ -466,10 +466,10 @@
             const faceLum = (fc.r * 0.299 + fc.g * 0.587 + fc.b * 0.114) / 255;
             const isLightFace = faceLum > 0.45;
 
-            // On light faces: dark saturated color so numbers pop
+            // On light faces: deep-but-not-black saturated color so numbers pop without heaviness
             // On dark faces: bright saturated color so they glow
             const l = isLightFace
-                ? (isHour ? 28 : 32)
+                ? (isHour ? 40 : 44)
                 : (isHour ? 90 : 85);
             return `hsl(${baseHue.toFixed(0)}, 100%, ${l}%)`;
         }
@@ -515,11 +515,10 @@
                 else if (minuteHue > 65 && minuteHue <= 120) minuteHue = 240;
             }
 
-            // Light faces: very dark saturated hands so the line pops
-            // Dark faces: bright neon hands so they glow
-            const tipL = isLightFace ? 15 : 85;
-            const midL = isLightFace ? 12 : 65;
-            const baseL = isLightFace ? 8 : 50;
+            // Light faces: deep-but-airy hands; dark faces: bright neon glow
+            const tipL = isLightFace ? 25 : 85;
+            const midL = isLightFace ? 20 : 65;
+            const baseL = isLightFace ? 14 : 50;
             const glowA = isLightFace ? 0.8 : 0.9;
             const hourW = isLightFace ? '0.65vmin' : '0.5vmin';
             const minuteW = isLightFace ? '0.5vmin' : '0.35vmin';
