@@ -80,7 +80,7 @@
             border: 0.15vmin solid color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 20%, rgba(0, 0, 0, 0.20));
 
             transform: scale(1) translateZ(0);
-            transition: background 1.5s linear, border 1.5s linear, box-shadow 1.5s linear;
+            transition: background 2.5s ease, border 2.5s ease, box-shadow 2.5s ease;
         }
 
         /* Color-shifting radial face — from design 3 */
@@ -93,7 +93,7 @@
             box-shadow:
                 inset 0 0 4vmin rgba(255, 255, 255, 0.06),
                 inset 2vmin 2vmin 5vmin rgba(0, 0, 0, 0.2);
-            transition: background 1.5s linear;
+            transition: background 2.5s ease;
             overflow: hidden;
         }
 
@@ -370,50 +370,38 @@
         }
 
         function shiftReality() {
+            // Initial placement only — demo loop drives all subsequent drifts
             const hAngle = Math.random() * Math.PI * 2;
             const newHTargetX = Math.cos(hAngle) * RADIUS;
             const newHTargetY = Math.sin(hAngle) * RADIUS;
-
             const mPos = getSafeXY(newHTargetX, newHTargetY);
+            hTargetX = newHTargetX;
+            hTargetY = newHTargetY;
+            mTargetX = mPos.x;
+            mTargetY = mPos.y;
+        }
 
+        // Trigger one drift cycle — both labels ghost and move simultaneously
+        function triggerOneDrift() {
+            const hAngle = Math.random() * Math.PI * 2;
+            const newHTargetX = Math.cos(hAngle) * RADIUS;
+            const newHTargetY = Math.sin(hAngle) * RADIUS;
+            const mPos = getSafeXY(newHTargetX, newHTargetY);
             const bezel = document.getElementById('clock-bezel');
 
-            if (hTargetX === 0 && hTargetY === 0) {
+            // Both labels drift together
+            bezel.classList.add('is-h-drifting', 'is-m-drifting');
+
+            setTimeout(() => {
                 hTargetX = newHTargetX;
                 hTargetY = newHTargetY;
                 mTargetX = mPos.x;
                 mTargetY = mPos.y;
-                setTimeout(shiftReality, 2000 + Math.random() * 3000);
-                return;
-            }
-
-            bezel.classList.add('is-h-drifting');
-
-            setTimeout(() => {
-                hTargetX = newHTargetX;
-                hTargetY = newHTargetY;
             }, 2000);
 
             setTimeout(() => {
-                bezel.classList.remove('is-h-drifting');
+                bezel.classList.remove('is-h-drifting', 'is-m-drifting');
             }, 10000);
-
-            const mDelay = 2000 + Math.random() * 2500;
-            setTimeout(() => {
-                bezel.classList.add('is-m-drifting');
-
-                setTimeout(() => {
-                    mTargetX = mPos.x;
-                    mTargetY = mPos.y;
-                }, 2000);
-
-                setTimeout(() => {
-                    bezel.classList.remove('is-m-drifting');
-                }, 10000);
-
-            }, mDelay);
-
-            setTimeout(shiftReality, mDelay + 12000 + Math.random() * 8000);
         }
 
         function hexToRgb(hex) {
@@ -702,18 +690,9 @@
         }
 
         // ─── Demo state machine ───
-        // Per-hour dwell times (ms) — weighted by visual distinctiveness
-        const demoDwells = [
-            2500, 2500, 2500, 2500, 2500, 2500, // 0–5: deep night (similar, brief)
-            8000,                                 // 6: sunrise (dramatic)
-            5000, 5000, 5000, 5000, 5000,        // 7–11: morning sky
-            7000,                                 // 12: noon (pure white, distinct)
-            4000, 4000,                           // 13–14: early afternoon
-            6000, 6000, 6000,                     // 15–17: golden hour
-            8000,                                 // 18: sunset (most dramatic)
-            8000,                                 // 19: dusk (purple, very distinct)
-            3000, 3000, 3000, 3000                // 20–23: evening fade (similar)
-        ];
+        const DWELL_MS = 5000;   // stable view time per hour
+        const DRIFT_MS = 10000;  // how long drift lasts before labels return
+        const COLOR_DELAY = 1000;  // start color fade 1s into drift (labels already ghosted)
 
         const demoHourLabels = [
             '12 AM', '1 AM', '2 AM', '3 AM', '4 AM', '5 AM',
@@ -721,8 +700,6 @@
             '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM',
             '6 PM', '7 PM', '8 PM', '9 PM', '10 PM', '11 PM'
         ];
-
-        const TRANSITION_MS = 1500;
 
         function applyDemoHour(h) {
             currentDemoH = h % 24;
@@ -746,26 +723,29 @@
         }
 
         function runDemoStep() {
-            // Fire the CSS transition to this hour
-            applyDemoHour(currentDemoH);
+            // Phase 1: dwell — labels visible, color stable
+            showDemoLabel(demoHourLabels[currentDemoH]);
 
-            // After transition settles: show label, start dwell
             setTimeout(() => {
-                showDemoLabel(demoHourLabels[currentDemoH]);
-                const dwell = demoDwells[currentDemoH];
+                // Phase 2: fade label, trigger drift
+                hideDemoLabel();
+                triggerOneDrift(); // labels ghost away
 
-                // Fade label out 600ms before transition fires
-                setTimeout(() => hideDemoLabel(), dwell - 600);
-
-                // Advance to next hour and recurse
+                // Phase 3: 1s into drift, blend to next palette
+                // Labels are fully ghosted by now, so color change is invisible to them
                 setTimeout(() => {
                     currentDemoH = (currentDemoH + 1) % 24;
-                    runDemoStep();
-                }, dwell);
-            }, TRANSITION_MS);
+                    applyDemoHour(currentDemoH);
+                }, COLOR_DELAY);
+
+                // Phase 4: drift settles — labels reappear in new color, start next dwell
+                setTimeout(runDemoStep, DRIFT_MS);
+
+            }, DWELL_MS);
         }
 
         shiftReality();
+        applyDemoHour(0);
         runDemoStep();
         update();
     </script>
