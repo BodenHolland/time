@@ -433,14 +433,17 @@
             return { x, y };
         }
 
-        // Initialize with distinct random targets immediately to prevent initial stacking
-        const startH = getSafeXY(100, 100); // Away from center
+        // Initial placement only — demo loop drives all subsequent drifts
+        const startH = getSafeXY(100, 100);
         const startM = getSafeXY(startH.x, startH.y);
         let hTargetX = startH.x, hTargetY = startH.y;
         let mTargetX = startM.x, mTargetY = startM.y;
 
+        // Smoothed base angles for labels (removes bounce)
+        window.rotHBase = undefined;
+        window.rotMBase = undefined;
         function shiftReality() {
-            // Initial placement only — demo loop drives all subsequent drifts
+            // Initial random placement
             const hAngle = Math.random() * Math.PI * 2;
             const newHTargetX = Math.cos(hAngle) * RADIUS;
             const newHTargetY = Math.sin(hAngle) * RADIUS;
@@ -818,6 +821,8 @@
             if (window.rotH === undefined) {
                 window.rotH = targetH;
                 window.rotM = targetM;
+                window.rotHBase = finalBaseHAngle;
+                window.rotMBase = finalBaseMAngle;
                 window.rotHT1 = targetH;
                 window.rotHT2 = targetH;
                 window.rotMT1 = targetM;
@@ -836,31 +841,39 @@
                 return current + diff * speed;
             }
 
+            // Update hand rotations (includes time offset)
             window.rotH = sweep(window.rotH, targetH, 0.015);
             window.rotM = sweep(window.rotM, targetM, 0.015);
 
+            // Update label base rotations (no time offset = no bounce)
+            window.rotHBase = sweep(window.rotHBase, finalBaseHAngle, 0.015);
+            window.rotMBase = sweep(window.rotMBase, finalBaseMAngle, 0.015);
+
+            // Trails follow the hand at varied speeds
             window.rotHT1 = sweep(window.rotHT1, targetH, 0.012);
             window.rotHT2 = sweep(window.rotHT2, targetH, 0.01);
-
             window.rotMT1 = sweep(window.rotMT1, targetM, 0.012);
             window.rotMT2 = sweep(window.rotMT2, targetM, 0.01);
 
             document.querySelector('.hand.hour').style.transform = `translateX(-50%) rotate(${window.rotH}deg)`;
             document.querySelector('.hand.minute').style.transform = `translateX(-50%) rotate(${window.rotM}deg)`;
 
-            // Pin labels directly to smoothed hand rotations (fixes bounce)
+            // Labels use a slightly larger radius so they aren't "impaled" by the hands
+            const LABEL_RADIUS = 31.8;
             function updateLabel(id, rot) {
                 const rad = (rot - 90) * Math.PI / 180;
-                const x = Math.cos(rad) * RADIUS;
-                const y = Math.sin(rad) * RADIUS;
+                const x = Math.cos(rad) * LABEL_RADIUS;
+                const y = Math.sin(rad) * LABEL_RADIUS;
                 document.getElementById(id).style.transform = `translate3d(calc(-50% + ${x}vmin), calc(-50% + ${y}vmin), 0)`;
             }
 
-            updateLabel('h-label', window.rotH);
+            // Numbers stay at the smoothed base anchor (no jitter)
+            updateLabel('h-label', window.rotHBase);
+            updateLabel('m-label', window.rotMBase);
+
+            // Trails still follow the hand movement for organic blur
             updateLabel('h-trail-1', window.rotHT1);
             updateLabel('h-trail-2', window.rotHT2);
-
-            updateLabel('m-label', window.rotM);
             updateLabel('m-trail-1', window.rotMT1);
             updateLabel('m-trail-2', window.rotMT2);
 
