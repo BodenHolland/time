@@ -473,10 +473,10 @@
             }, 1600);
 
             // 3. Keep ghosted while "sailing" to new spot 
-            // (The sweep speed 0.015 takes roughly 6-7s to settle)
+            // (The sweep speed 0.015 takes roughly 5-6s to settle)
             setTimeout(() => {
                 document.body.classList.remove(driftingClass);
-            }, 9000);
+            }, 6500);
         }
 
         /**
@@ -948,7 +948,7 @@
         // ─── Production: Independent Hour & Minute drifts ───
         // Dwell time (10-15s) happens AFTER the transition finishes.
         function scheduleDriftLoop(type) {
-            const transitionDuration = 9000;
+            const transitionDuration = 6500;
             const minDwell = 10000;
             const randomDwell = Math.random() * 5000;
 
