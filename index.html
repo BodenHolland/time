@@ -858,12 +858,11 @@
             document.querySelector('.hand.hour').style.transform = `translateX(-50%) rotate(${window.rotH}deg)`;
             document.querySelector('.hand.minute').style.transform = `translateX(-50%) rotate(${window.rotM}deg)`;
 
-            // Labels use a slightly larger radius so they aren't "impaled" by the hands
-            const LABEL_RADIUS = 31.8;
+            // Exact placement from v5: labels at 28.5vmin
             function updateLabel(id, rot) {
                 const rad = (rot - 90) * Math.PI / 180;
-                const x = Math.cos(rad) * LABEL_RADIUS;
-                const y = Math.sin(rad) * LABEL_RADIUS;
+                const x = Math.cos(rad) * RADIUS;
+                const y = Math.sin(rad) * RADIUS;
                 document.getElementById(id).style.transform = `translate3d(calc(-50% + ${x}vmin), calc(-50% + ${y}vmin), 0)`;
             }
 
