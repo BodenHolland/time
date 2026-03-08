@@ -42,12 +42,10 @@
             height: var(--clock-size);
             border-radius: 50%;
             box-shadow:
-                /* Guaranteed neutral umbra — always visible against white page */
-                0 4vmin 10vmin rgba(0, 0, 0, 0.18),
-                0 1.5vmin 4vmin rgba(0, 0, 0, 0.10),
-                /* Accent-tinted layer on top for color anticipation */
-                0 3vmin 8vmin color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 12%, transparent),
-                0 1vmin 3vmin color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 5%, transparent);
+                /* Single smooth neutral shadow — large blur, no banding */
+                0 2vmin 14vmin rgba(0, 0, 0, 0.16),
+                /* Soft accent tint on top for warmth/color */
+                0 2vmin 12vmin color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 10%, transparent);
             transform: scale(1) translateZ(0);
             transition: box-shadow 1s linear;
         }
