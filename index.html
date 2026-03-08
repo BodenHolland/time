@@ -80,7 +80,7 @@
             border: 0.15vmin solid color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 20%, rgba(0, 0, 0, 0.20));
 
             transform: scale(1) translateZ(0);
-            transition: background 7s ease, border 7s ease, box-shadow 7s ease;
+            transition: none;
         }
 
         /* Color-shifting radial face — from design 3 */
@@ -93,7 +93,7 @@
             box-shadow:
                 inset 0 0 4vmin rgba(255, 255, 255, 0.06),
                 inset 2vmin 2vmin 5vmin rgba(0, 0, 0, 0.2);
-            transition: background 7s ease;
+            transition: none;
             overflow: hidden;
         }
 
@@ -696,31 +696,27 @@
             requestAnimationFrame(update);
         }
 
-        // ─── Demo state machine ───
-        const DWELL_MS = 8000;   // stable color view time per step
-        const DRIFT_MS = 13000;  // 10s drift class + 3s return transition = labels fully back
-        const COLOR_DELAY = 2000;  // matches label fade-out duration — color fires when fully invisible
+        // ─── v6 Demo — instant cuts, 4s per step ───
+        const DEMO_STEP_MS = 4000;
 
-        // Curated sequence — skips near-identical deep-night hours
-        // Night block condensed to 4 representative steps; all daytime shown individually
         const demoSteps = [
-            { h: 20, label: '10 PM' },         // Evening
-            { h: 23, label: '11 PM – 2 AM' },   // Deep night block
-            { h: 3, label: '2 AM – 5 AM' },   // Pre-dawn block
-            { h: 5, label: '5 AM' },   // Dawn violet
-            { h: 6, label: '6 AM' },   // Sunrise
+            { h: 20, label: '10 PM' },
+            { h: 23, label: '11 PM – 2 AM' },
+            { h: 3, label: '2 AM – 5 AM' },
+            { h: 5, label: '5 AM' },
+            { h: 6, label: '6 AM' },
             { h: 7, label: '7 AM' },
             { h: 8, label: '8 AM' },
-            { h: 9, label: '9 AM – 10 AM' }, // Morning sky block
+            { h: 9, label: '9 – 10 AM' },
             { h: 11, label: '11 AM' },
-            { h: 12, label: '12 PM' },   // Noon
+            { h: 12, label: '12 PM' },
             { h: 13, label: '1 PM' },
             { h: 14, label: '2 PM' },
             { h: 15, label: '3 PM' },
-            { h: 16, label: '4 PM' },   // Golden hour begins
+            { h: 16, label: '4 PM' },
             { h: 17, label: '5 PM' },
-            { h: 18, label: '6 PM' },   // Sunset
-            { h: 19, label: '7 PM' },   // Dusk
+            { h: 18, label: '6 PM' },
+            { h: 19, label: '7 PM' },
         ];
 
         let demoStepIdx = 0;
@@ -742,31 +738,12 @@
             el.style.opacity = '1';
         }
 
-        function hideDemoLabel() {
-            document.getElementById('demo-time-label').style.opacity = '0';
-        }
-
         function runDemoStep() {
             const step = demoSteps[demoStepIdx];
-
-            // Phase 1: dwell — labels visible, color stable
+            applyDemoHour(step.h);
             showDemoLabel(step.label);
-
-            setTimeout(() => {
-                // Phase 2: fade label, trigger drift (labels ghost away)
-                hideDemoLabel();
-                triggerOneDrift();
-
-                // Phase 3: 1s into drift, blend to next palette
-                setTimeout(() => {
-                    demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
-                    applyDemoHour(demoSteps[demoStepIdx].h);
-                }, COLOR_DELAY);
-
-                // Phase 4: drift settles — labels reappear in new color, start next dwell
-                setTimeout(runDemoStep, DRIFT_MS);
-
-            }, DWELL_MS);
+            demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
+            setTimeout(runDemoStep, DEMO_STEP_MS);
         }
 
         shiftReality();
