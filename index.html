@@ -282,7 +282,7 @@
         /* Demo time label — shows current simulated hour during dwell */
         #demo-time-label {
             position: fixed;
-            bottom: 4vmin;
+            bottom: 6vmin;
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Inter', sans-serif;
@@ -295,6 +295,31 @@
             transition: opacity 0.6s ease;
             pointer-events: none;
             user-select: none;
+            z-index: 2000;
+        }
+
+        #demo-description {
+            position: fixed;
+            bottom: 3vmin;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50vmin;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1vmin;
+            font-weight: 300;
+            line-height: 1.6;
+            color: rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            transition: opacity 0.8s ease 0.2s;
+            pointer-events: none;
+            user-select: none;
+            z-index: 2000;
+        }
+
+        .is-demo-active #demo-time-label,
+        .is-demo-active #demo-description {
+            opacity: 1;
         }
     </style>
 </head>
@@ -303,6 +328,9 @@
 
     <div id="clock-shadow"></div>
     <div id="demo-time-label"></div>
+    <div id="demo-description">
+        Seasonally Aware: Approximates sunrise & sunset via system date to dynamically anchor the 24-hour hue cycle.
+    </div>
     <div id="clock-bezel">
         <div id="clock-face">
             <!-- Viscous Trails -->
@@ -324,36 +352,37 @@
     <script>
         // Full 24-hour color palette — from design 3 (restored text colors)
         const timePalettes = [
-            { center: '#1e1a4a', edge: '#0c0828', text: '#b0aaff' }, // 0: Midnight — deep indigo
-            { center: '#1c1d52', edge: '#0a0930', text: '#aaaeff' }, // 1: Deep Night — blue-indigo
-            { center: '#1a2260', edge: '#090f38', text: '#99aaff' }, // 2: Deep Night — sapphire
-            { center: '#1e2c72', edge: '#0c1445', text: '#90a8ff' }, // 3: Pre-dawn — cobalt
-            { center: '#243680', edge: '#0e1a50', text: '#88aaff' }, // 4: Dawn approaches — royal blue
-            { center: '#3a3d90', edge: '#18154a', text: '#c0b8ff' }, // 5: Dawn — violet blue
-            { center: '#ffb97b', edge: '#8b3a58', text: '#2a1a1a' }, // 6: Sunrise
-            { center: '#f4e2d8', edge: '#e09886', text: '#1a1a1a' }, // 7: Early Morning
-            { center: '#d1ebfa', edge: '#85bbd9', text: '#133a4f' }, // 8: Morning
-            { center: '#c1e5fc', edge: '#6facd3', text: '#11354a' }, // 9: Mid-Morning
-            { center: '#bde2fd', edge: '#58a0d0', text: '#0e2b3c' }, // 10: Late Morning
-            { center: '#e4f3ff', edge: '#81bdea', text: '#0f2f42' }, // 11: Noon roughly
-            { center: '#ffffff', edge: '#a4cdef', text: '#162e59' }, // 12: Noon
-            { center: '#f5fbff', edge: '#8bbfe5', text: '#142a54' }, // 13: Midday
-            { center: '#eaf4fc', edge: '#76b1db', text: '#112249' }, // 14: Midday
-            { center: '#fcf3e3', edge: '#bba27e', text: '#26223b' }, // 15: Afternoon
-            { center: '#ffdfb3', edge: '#d39255', text: '#2f1a3a' }, // 16: Late Afternoon
-            { center: '#ffae6b', edge: '#e05929', text: '#420b1c' }, // 17: Golden Hour
-            { center: '#ff7e5f', edge: '#8f2336', text: '#fafafa' }, // 18: Sunset
+            { center: '#14184a', edge: '#060a28', text: '#88aaff' }, // 0: Midnight — deep navy
+            { center: '#161a52', edge: '#060a28', text: '#9099ff' }, // 1: Night
+            { center: '#1a1e60', edge: '#060e32', text: '#9999ff' }, // 2: Night
+            { center: '#202672', edge: '#081240', text: '#a0aaff' }, // 3: Night
+            { center: '#283285', edge: '#0a1a50', text: '#b0bbff' }, // 4: Pre-dawn
+            { center: '#4b3f90', edge: '#1a154a', text: '#c0b8ff' }, // 5: Dawn — violet/lavender
+            { center: '#e0a3c2', edge: '#3d2b7c', text: '#2a1a2a' }, // 6: Sunrise — blush/violet (Reference)
+            { center: '#e0f2ff', edge: '#f4c2d3', text: '#1a2b3c' }, // 7: Early Morning — sky/blush
+            { center: '#d1ebfa', edge: '#9dbcd9', text: '#112a44' }, // 8: Morning — bright sky
+            { center: '#c1e5fc', edge: '#7bb1d9', text: '#0a2540' }, // 9: Mid-Morning
+            { center: '#bde2fd', edge: '#65a5d2', text: '#082038' }, // 10: Late Morning
+            { center: '#e4f3ff', edge: '#81bdea', text: '#061b36' }, // 11: Noon roughly
+            { center: '#ffffff', edge: '#a4cdef', text: '#051832' }, // 12: Noon — brightest white-blue
+            { center: '#f5fbff', edge: '#8bbfe5', text: '#071c3a' }, // 13: Midday
+            { center: '#eaf4fc', edge: '#76b1db', text: '#092144' }, // 14: Afternoon
+            { center: '#dbe9f4', edge: '#9ebccf', text: '#1a2b44' }, // 15: Afternoon
+            { center: '#e8daef', edge: '#a9c6e3', text: '#2a1a3a' }, // 16: Late Afternoon — soft rose hint
+            { center: '#f2c6de', edge: '#b2aedb', text: '#351a4a' }, // 17: Golden Hour — blush/lavender
+            { center: '#e082ae', edge: '#5a3c7a', text: '#f5f5f5' }, // 18: Sunset — deep rose/violet
             { center: '#8a4067', edge: '#291b3d', text: '#f0f0f0' }, // 19: Dusk
-            { center: '#2e3880', edge: '#121858', text: '#b0c8ff' }, // 20: Blue Hour — deep blue
-            { center: '#252a68', edge: '#0e1040', text: '#aab8ff' }, // 21: Night — cobalt
-            { center: '#201e58', edge: '#0c0a32', text: '#a8a8ff' }, // 22: Late Night — indigo
-            { center: '#1e1c50', edge: '#0a0828', text: '#b0aaff' }  // 23: Night — deep indigo
+            { center: '#2e3880', edge: '#121858', text: '#b0c8ff' }, // 20: Blue Hour
+            { center: '#252a68', edge: '#0e1040', text: '#aab8ff' }, // 21: Night
+            { center: '#201e58', edge: '#0c0a32', text: '#a8a8ff' }, // 22: Night
+            { center: '#1e1c50', edge: '#0a0828', text: '#b0aaff' }  // 23: Night
         ];
 
         let lastMilestone = -1;
         let lastSecond = -1;
         let rotS = 0;
         let currentDemoH = 0; // controlled by runDemoStep() state machine
+        window.isDemoActive = false; // flag to switch between real-time and demo
 
         let hTargetX = 0, hTargetY = 0;
         let mTargetX = 0, mTargetY = 0;
@@ -402,6 +431,56 @@
             setTimeout(() => {
                 bezel.classList.remove('is-h-drifting', 'is-m-drifting');
             }, 10000);
+        }
+
+        /**
+         * Approximates sunrise and sunset hours based on the day of the year.
+         * Modeled for ~40°N latitude (standard mid-latitude).
+         * Summer Solstice (Jun 21): Sunrise 5:30 AM, Sunset 8:30 PM (20.5)
+         * Winter Solstice (Dec 21): Sunrise 7:30 AM, Sunset 4:30 PM (16.5)
+         */
+        function getSolarAnchors() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 0);
+            const diff = now - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+
+            // Peaks at 1 on Summer Solstice (day 172), -1 on Winter Solstice (day 355)
+            const seasonalOscillator = Math.cos((dayOfYear - 172) * 2 * Math.PI / 365.25);
+
+            // Summer (osc=1): Sunrise 5:30, Sunset 20:30
+            // Winter (osc=-1): Sunrise 7:30, Sunset 16:30
+            const sunrise = 6.5 - seasonalOscillator * 1.0;
+            const sunset = 18.5 + seasonalOscillator * 2.0;
+            const solarNoon = (sunrise + sunset) / 2;
+
+            return { sunrise, sunset, solarNoon };
+        }
+
+        /**
+         * Maps real local time [0-24] to a "virtual solar hour" [0-24].
+         * Virtual 6 is always Sunrise.
+         * Virtual 12 is always Solar Noon.
+         * Virtual 18 is always Sunset.
+         */
+        function getVirtualSolarHour(realH, realM, realS) {
+            const time = realH + realM / 60 + realS / 3600;
+            const { sunrise, sunset, solarNoon } = getSolarAnchors();
+
+            if (time < sunrise) {
+                // Pre-dawn: [0 to Sunrise] -> [0 to 6]
+                return (time / sunrise) * 6;
+            } else if (time < solarNoon) {
+                // Morning: [Sunrise to Noon] -> [6 to 12]
+                return 6 + ((time - sunrise) / (solarNoon - sunrise)) * 6;
+            } else if (time < sunset) {
+                // Afternoon: [Noon to Sunset] -> [12 to 18]
+                return 12 + ((time - solarNoon) / (sunset - solarNoon)) * 6;
+            } else {
+                // Night: [Sunset to 24] -> [18 to 24]
+                return 18 + ((time - sunset) / (24 - sunset)) * 6;
+            }
         }
 
         function hexToRgb(hex) {
@@ -508,14 +587,16 @@
             const faceLum = (cr * 0.299 + cg * 0.587 + cb * 0.114) / 255;
             const isLightFace = faceLum > 0.40;
 
-            // On light faces: brown/amber (10-65°) and olive-yellow (65-120°) look muddy or dirty.
-            // Shift them to cool sky-blue tones that feel light and daytime instead.
             if (isLightFace) {
+                // Shift brown/amber (10-65°), olive-yellow (65-120°), and green/mint (120-180°)
+                // towards cool sky-blue and periwinkle tones for a fresher daytime look.
                 if (hourHue >= 10 && hourHue <= 65) hourHue = 205;  // brown → sky blue
                 else if (hourHue > 65 && hourHue <= 120) hourHue = 220; // olive → soft periwinkle
+                else if (hourHue > 120 && hourHue <= 180) hourHue = 210; // green → light blue
 
                 if (minuteHue >= 10 && minuteHue <= 65) minuteHue = 220; // brown → periwinkle
                 else if (minuteHue > 65 && minuteHue <= 120) minuteHue = 195; // olive → cool teal
+                else if (minuteHue > 120 && minuteHue <= 180) minuteHue = 200; // green → sky blue
             }
 
             // Light faces: scale hand lightness with face brightness
@@ -615,9 +696,22 @@
             let targetH = finalBaseHAngle + hOffset;
             let targetM = finalBaseMAngle + mOffset;
 
-            // ─── Color — driven by state machine (currentDemoH) ───
-            const cp = timePalettes[currentDemoH % 24];
-            const np = timePalettes[(currentDemoH + 1) % 24];
+            // ─── Color logic ───
+            // If in demo mode, currentDemoH is controlled by the state machine.
+            // If not in demo mode, we calculate it based on seasonal solar logic.
+            let solarH;
+            if (window.isDemoActive) {
+                solarH = currentDemoH;
+            } else {
+                solarH = getVirtualSolarHour(h, m, s);
+            }
+
+            const currentIdx = Math.floor(solarH) % 24;
+            const nextIdx = (currentIdx + 1) % 24;
+            const progress = solarH % 1;
+
+            const cp = timePalettes[currentIdx];
+            const np = timePalettes[nextIdx];
 
             // ─── Vibrant label glows from palette text colors ───
             // Interpolate the text color across the current palette step
@@ -739,6 +833,8 @@
         }
 
         function runDemoStep() {
+            window.isDemoActive = true;
+            document.body.classList.add('is-demo-active');
             const step = demoSteps[demoStepIdx];
             applyDemoHour(step.h);
             showDemoLabel(step.label);
