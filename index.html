@@ -691,7 +691,7 @@
 
         // ─── Demo state machine ───
         const DWELL_MS = 5000;   // stable view time per hour
-        const DRIFT_MS = 10000;  // how long drift lasts before labels return
+        const DRIFT_MS = 13000;  // 10s drift class + 3s return transition = labels fully back
         const COLOR_DELAY = 1000;  // start color fade 1s into drift (labels already ghosted)
 
         const demoHourLabels = [
