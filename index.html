@@ -201,16 +201,16 @@
         /* Ghosting Effect during Drift */
         .is-h-drifting .hour-label,
         .is-m-drifting .minute-label {
-            opacity: 0.03;
-            filter: blur(4px);
-            transition: opacity 2s ease, filter 2s ease;
+            opacity: 0;
+            filter: blur(8px);
+            transition: opacity 1.5s ease-in, filter 1.5s ease-in;
         }
 
         .is-h-drifting .hand.hour,
         .is-m-drifting .hand.minute {
-            opacity: 0.03;
-            filter: blur(3px);
-            transition: opacity 2s ease, filter 2s ease;
+            opacity: 0;
+            filter: blur(6px);
+            transition: opacity 1.5s ease-in, filter 1.5s ease-in;
         }
 
         /* Laser beam hands — from design 4, colors adapt to time of day */
@@ -449,7 +449,7 @@
             // 1. Ghost out
             document.body.classList.add(driftingClass);
 
-            // 2. Wait for ghosting to peak, then update target
+            // 2. Wait for ghosting to peak (1.5s), then update target
             setTimeout(() => {
                 const angle = Math.random() * Math.PI * 2;
                 const targetX = Math.cos(angle) * RADIUS;
@@ -463,13 +463,13 @@
                     mTargetX = mPos.x;
                     mTargetY = mPos.y;
                 }
-            }, 2000);
+            }, 1600);
 
             // 3. Keep ghosted while "sailing" to new spot 
             // (The sweep speed 0.01 takes roughly 8-10s to fully settle)
             setTimeout(() => {
                 document.body.classList.remove(driftingClass);
-            }, 12000);
+            }, 15000);
         }
 
         /**
@@ -815,8 +815,13 @@
 
             function sweep(current, target, speed) {
                 let diff = (target - current) % 360;
-                if (diff < 0) diff += 360;
-                if (diff > 359.5) diff = 0;
+                // Normalize to [-180, 180] for shortest path
+                if (diff > 180) diff -= 360;
+                if (diff < -180) diff += 360;
+
+                // Extremely tiny snap to prevent floating jitter at rest
+                if (Math.abs(diff) < 0.01) return target;
+
                 return current + diff * speed;
             }
 
