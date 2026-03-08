@@ -80,7 +80,7 @@
             border: 0.15vmin solid color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 20%, rgba(0, 0, 0, 0.20));
 
             transform: scale(1) translateZ(0);
-            transition: background 1s linear, border 1s linear, box-shadow 1s linear;
+            transition: background 1.5s linear, border 1.5s linear, box-shadow 1.5s linear;
         }
 
         /* Color-shifting radial face — from design 3 */
@@ -93,7 +93,7 @@
             box-shadow:
                 inset 0 0 4vmin rgba(255, 255, 255, 0.06),
                 inset 2vmin 2vmin 5vmin rgba(0, 0, 0, 0.2);
-            transition: background 1s linear;
+            transition: background 1.5s linear;
             overflow: hidden;
         }
 
@@ -278,12 +278,31 @@
                 0 0 0.3vmin rgba(255, 255, 255, 0.2),
                 0 0 1.5vmin color-mix(in srgb, var(--current-accent, white) 15%, transparent);
         }
+
+        /* Demo time label — shows current simulated hour during dwell */
+        #demo-time-label {
+            position: fixed;
+            bottom: 4vmin;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.4vmin;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+            user-select: none;
+        }
     </style>
 </head>
 
 <body>
 
     <div id="clock-shadow"></div>
+    <div id="demo-time-label"></div>
     <div id="clock-bezel">
         <div id="clock-face">
             <!-- Viscous Trails -->
@@ -334,6 +353,7 @@
         let lastMilestone = -1;
         let lastSecond = -1;
         let rotS = 0;
+        let currentDemoH = 0; // controlled by runDemoStep() state machine
 
         let hTargetX = 0, hTargetY = 0;
         let mTargetX = 0, mTargetY = 0;
@@ -600,24 +620,9 @@
             let targetH = finalBaseHAngle + hOffset;
             let targetM = finalBaseMAngle + mOffset;
 
-            // ─── Color-shifting logic — design 3 system ───
-            const DEMO_CYCLE_MS = 120 * 1000;
-            const demoMs = (Date.now() % DEMO_CYCLE_MS);
-            const demoHourFrac = (demoMs / DEMO_CYCLE_MS) * 24;
-            const demoH = Math.floor(demoHourFrac);
-            const demoProgress = demoHourFrac - demoH;
-            const cp = timePalettes[demoH % 24];
-            const np = timePalettes[(demoH + 1) % 24];
-
-            document.documentElement.style.setProperty('--face-center',
-                `color-mix(in srgb, ${np.center} ${demoProgress * 100}%, ${cp.center})`);
-            document.documentElement.style.setProperty('--face-edge',
-                `color-mix(in srgb, ${np.edge} ${demoProgress * 100}%, ${cp.edge})`);
-
-            // Output the current and next accent colors to the CSS root
-            document.documentElement.style.setProperty('--current-accent', cp.text);
-            document.documentElement.style.setProperty('--next-accent', np.text);
-            document.documentElement.style.setProperty('--next-face', np.center);
+            // ─── Color — driven by state machine (currentDemoH) ───
+            const cp = timePalettes[currentDemoH % 24];
+            const np = timePalettes[(currentDemoH + 1) % 24];
 
             // ─── Vibrant label glows from palette text colors ───
             // Interpolate the text color across the current palette step
@@ -696,7 +701,72 @@
             requestAnimationFrame(update);
         }
 
+        // ─── Demo state machine ───
+        // Per-hour dwell times (ms) — weighted by visual distinctiveness
+        const demoDwells = [
+            2500, 2500, 2500, 2500, 2500, 2500, // 0–5: deep night (similar, brief)
+            8000,                                 // 6: sunrise (dramatic)
+            5000, 5000, 5000, 5000, 5000,        // 7–11: morning sky
+            7000,                                 // 12: noon (pure white, distinct)
+            4000, 4000,                           // 13–14: early afternoon
+            6000, 6000, 6000,                     // 15–17: golden hour
+            8000,                                 // 18: sunset (most dramatic)
+            8000,                                 // 19: dusk (purple, very distinct)
+            3000, 3000, 3000, 3000                // 20–23: evening fade (similar)
+        ];
+
+        const demoHourLabels = [
+            '12 AM', '1 AM', '2 AM', '3 AM', '4 AM', '5 AM',
+            '6 AM', '7 AM', '8 AM', '9 AM', '10 AM', '11 AM',
+            '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM',
+            '6 PM', '7 PM', '8 PM', '9 PM', '10 PM', '11 PM'
+        ];
+
+        const TRANSITION_MS = 1500;
+
+        function applyDemoHour(h) {
+            currentDemoH = h % 24;
+            const cp = timePalettes[currentDemoH];
+            const np = timePalettes[(currentDemoH + 1) % 24];
+            document.documentElement.style.setProperty('--face-center', cp.center);
+            document.documentElement.style.setProperty('--face-edge', cp.edge);
+            document.documentElement.style.setProperty('--current-accent', cp.text);
+            document.documentElement.style.setProperty('--next-accent', np.text);
+            document.documentElement.style.setProperty('--next-face', np.center);
+        }
+
+        function showDemoLabel(text) {
+            const el = document.getElementById('demo-time-label');
+            el.textContent = text;
+            el.style.opacity = '1';
+        }
+
+        function hideDemoLabel() {
+            document.getElementById('demo-time-label').style.opacity = '0';
+        }
+
+        function runDemoStep() {
+            // Fire the CSS transition to this hour
+            applyDemoHour(currentDemoH);
+
+            // After transition settles: show label, start dwell
+            setTimeout(() => {
+                showDemoLabel(demoHourLabels[currentDemoH]);
+                const dwell = demoDwells[currentDemoH];
+
+                // Fade label out 600ms before transition fires
+                setTimeout(() => hideDemoLabel(), dwell - 600);
+
+                // Advance to next hour and recurse
+                setTimeout(() => {
+                    currentDemoH = (currentDemoH + 1) % 24;
+                    runDemoStep();
+                }, dwell);
+            }, TRANSITION_MS);
+        }
+
         shiftReality();
+        runDemoStep();
         update();
     </script>
 </body>
