@@ -420,12 +420,19 @@
 
         const RADIUS = 28.5;
 
-        function getSafeXY(fixedX, fixedY) {
-            let angle = Math.random() * Math.PI * 2;
-            let x = Math.cos(angle) * RADIUS;
-            let y = Math.sin(angle) * RADIUS;
+        function getSafeXY(fixedX, fixedY, attempt = 0) {
+            // Pick a random point on the circle
+            const angle = Math.random() * Math.PI * 2;
+            const x = Math.cos(angle) * RADIUS;
+            const y = Math.sin(angle) * RADIUS;
+
+            // Check distance from the fixed point
             const dist = Math.sqrt((x - fixedX) ** 2 + (y - fixedY) ** 2);
-            if (dist < 23) return getSafeXY(fixedX, fixedY);
+
+            // If too close, try again (up to 10 times to avoid infinite recursion)
+            if (dist < 26 && attempt < 10) {
+                return getSafeXY(fixedX, fixedY, attempt + 1);
+            }
             return { x, y };
         }
 
@@ -451,17 +458,17 @@
 
             // 2. Wait for ghosting to peak (1.5s), then update target
             setTimeout(() => {
-                const angle = Math.random() * Math.PI * 2;
-                const targetX = Math.cos(angle) * RADIUS;
-                const targetY = Math.sin(angle) * RADIUS;
+                // Ensure we don't land on top of the other hand
+                const otherX = isH ? mTargetX : hTargetX;
+                const otherY = isH ? mTargetY : hTargetY;
+                const pos = getSafeXY(otherX, otherY);
 
                 if (isH) {
-                    hTargetX = targetX;
-                    hTargetY = targetY;
+                    hTargetX = pos.x;
+                    hTargetY = pos.y;
                 } else {
-                    const mPos = getSafeXY(targetX, targetY);
-                    mTargetX = mPos.x;
-                    mTargetY = mPos.y;
+                    mTargetX = pos.x;
+                    mTargetY = pos.y;
                 }
             }, 1600);
 
