@@ -341,10 +341,9 @@
 
 <body>
 
-    <div id="version-tag">V7 — Smooth</div>
     <div id="clock-shadow"></div>
-    <div id="demo-time-label"></div>
-    <div id="demo-description">
+    <div id="demo-time-label" style="display: none;"></div>
+    <div id="demo-description" style="display: none;">
         Seasonally Aware: Approximates sunrise & sunset via system date to dynamically anchor the 24-hour hue cycle.
     </div>
     <div id="clock-bezel">
@@ -880,9 +879,18 @@
         }
 
         shiftReality();
-        applyDemoHour(demoSteps[0].h);
-        runDemoStep();
         update();
+
+        // ─── Production: Long-interval stochastic drifts (8-12 minutes) ───
+        function scheduleNextProductionDrift() {
+            const minMs = 8 * 60 * 1000;
+            const randomAddMs = Math.random() * 4 * 60 * 1000;
+            setTimeout(() => {
+                triggerOneDrift();
+                scheduleNextProductionDrift();
+            }, minMs + randomAddMs);
+        }
+        scheduleNextProductionDrift();
     </script>
 </body>
 
