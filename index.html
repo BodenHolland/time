@@ -265,22 +265,21 @@
             left: 50%;
             width: 2.36vmin;
             height: 2.36vmin;
-            /* Lighter version of the face center — glass bubble effect */
+            /* Subtle lighter version of the face center — barely-there glass */
             background: radial-gradient(circle at 35% 30%,
-                    color-mix(in srgb, white 65%, var(--face-center) 35%),
-                    color-mix(in srgb, white 25%, var(--face-center) 75%));
+                    color-mix(in srgb, white 22%, var(--face-center) 78%),
+                    color-mix(in srgb, white 8%, var(--face-center) 92%));
             border-radius: 50%;
             transform: translate(-50%, -50%);
             z-index: 1000;
             transition: background 1s linear;
             box-shadow:
-                /* Inner specular highlight — gives glass depth */
-                inset 0.15vmin 0.15vmin 0.4vmin rgba(255, 255, 255, 0.7),
-                inset -0.1vmin -0.1vmin 0.3vmin rgba(0, 0, 0, 0.15),
-                /* Outer glow matching clock accent */
-                0 0 0.5vmin rgba(255, 255, 255, 0.5),
-                0 0 2vmin color-mix(in srgb, var(--current-accent, white) 30%, transparent),
-                0 0 4vmin color-mix(in srgb, var(--next-accent, white) 15%, transparent);
+                /* Subtle inner specular — gentle glass edge */
+                inset 0.1vmin 0.1vmin 0.3vmin rgba(255, 255, 255, 0.3),
+                inset -0.05vmin -0.05vmin 0.2vmin rgba(0, 0, 0, 0.1),
+                /* Very soft outer glow — barely visible */
+                0 0 0.3vmin rgba(255, 255, 255, 0.2),
+                0 0 1.5vmin color-mix(in srgb, var(--current-accent, white) 15%, transparent);
         }
     </style>
 </head>
