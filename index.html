@@ -80,7 +80,7 @@
             border: 0.15vmin solid color-mix(in srgb, var(--next-accent, rgba(0, 0, 0, 1)) 20%, rgba(0, 0, 0, 0.20));
 
             transform: scale(1) translateZ(0);
-            transition: background 4s ease, border 4s ease, box-shadow 4s ease;
+            transition: background 7s ease, border 7s ease, box-shadow 7s ease;
         }
 
         /* Color-shifting radial face — from design 3 */
@@ -93,7 +93,7 @@
             box-shadow:
                 inset 0 0 4vmin rgba(255, 255, 255, 0.06),
                 inset 2vmin 2vmin 5vmin rgba(0, 0, 0, 0.2);
-            transition: background 4s ease;
+            transition: background 7s ease;
             overflow: hidden;
         }
 
@@ -507,10 +507,15 @@
             // At tipL=25%, natural complements of a morning-blue face are warm amber + spring green
             // — no shifting needed. Only shift was designed for old tipL=8% (where those hues looked muddy).
 
-            // Light faces: deep-but-airy hands; dark faces: bright neon glow
-            const tipL = isLightFace ? 25 : 85;
-            const midL = isLightFace ? 20 : 65;
-            const baseL = isLightFace ? 14 : 50;
+            // Light faces: scale hand lightness with face brightness
+            // Very bright (7AM warmth, noon, lum>0.80): lighter hands so they feel airy
+            // Moderately light (lum 0.40-0.80): slightly darker for readability
+            const lightTipL = faceLum > 0.80 ? 35 : 25;
+            const lightMidL = faceLum > 0.80 ? 28 : 20;
+            const lightBaseL = faceLum > 0.80 ? 20 : 14;
+            const tipL = isLightFace ? lightTipL : 85;
+            const midL = isLightFace ? lightMidL : 65;
+            const baseL = isLightFace ? lightBaseL : 50;
             const glowA = isLightFace ? 0.8 : 0.9;
             const hourW = isLightFace ? '0.65vmin' : '0.5vmin';
             const minuteW = isLightFace ? '0.5vmin' : '0.35vmin';
