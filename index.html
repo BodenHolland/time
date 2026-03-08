@@ -294,6 +294,21 @@
             z-index: 2000;
         }
 
+        #version-tag {
+            position: fixed;
+            top: 4vmin;
+            right: 4vmin;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2vmin;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            pointer-events: none;
+            user-select: none;
+            z-index: 2000;
+        }
+
         /* Demo time label — shows current simulated hour during dwell */
         #demo-time-label {
             position: fixed;
@@ -341,6 +356,7 @@
 
 <body>
 
+    <div id="version-tag">V7</div>
     <div id="clock-shadow"></div>
     <div id="demo-time-label" style="display: none;"></div>
     <div id="demo-description" style="display: none;">
