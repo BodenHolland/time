@@ -690,16 +690,34 @@
         }
 
         // ─── Demo state machine ───
-        const DWELL_MS = 5000;   // stable view time per hour
+        const DWELL_MS = 5000;   // stable view time per step
         const DRIFT_MS = 13000;  // 10s drift class + 3s return transition = labels fully back
-        const COLOR_DELAY = 1000;  // start color fade 1s into drift (labels already ghosted)
+        const COLOR_DELAY = 1000;   // color change fires 1s into drift (labels fully ghosted at 2s)
 
-        const demoHourLabels = [
-            '12 AM', '1 AM', '2 AM', '3 AM', '4 AM', '5 AM',
-            '6 AM', '7 AM', '8 AM', '9 AM', '10 AM', '11 AM',
-            '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM',
-            '6 PM', '7 PM', '8 PM', '9 PM', '10 PM', '11 PM'
+        // Curated sequence — skips near-identical deep-night hours
+        // Night block condensed to 4 representative steps; all daytime shown individually
+        const demoSteps = [
+            { h: 20, label: '10 PM' },   // Evening blue
+            { h: 23, label: 'Midnight' }, // Deep night representative
+            { h: 3, label: '3 AM' },   // Pre-dawn
+            { h: 5, label: '5 AM' },   // Dawn violet
+            { h: 6, label: '6 AM' },   // Sunrise
+            { h: 7, label: '7 AM' },
+            { h: 8, label: '8 AM' },
+            { h: 9, label: '9 AM' },
+            { h: 10, label: '10 AM' },
+            { h: 11, label: '11 AM' },
+            { h: 12, label: '12 PM' },   // Noon
+            { h: 13, label: '1 PM' },
+            { h: 14, label: '2 PM' },
+            { h: 15, label: '3 PM' },
+            { h: 16, label: '4 PM' },   // Golden hour begins
+            { h: 17, label: '5 PM' },
+            { h: 18, label: '6 PM' },   // Sunset
+            { h: 19, label: '7 PM' },   // Dusk
         ];
+
+        let demoStepIdx = 0;
 
         function applyDemoHour(h) {
             currentDemoH = h % 24;
@@ -723,19 +741,20 @@
         }
 
         function runDemoStep() {
+            const step = demoSteps[demoStepIdx];
+
             // Phase 1: dwell — labels visible, color stable
-            showDemoLabel(demoHourLabels[currentDemoH]);
+            showDemoLabel(step.label);
 
             setTimeout(() => {
-                // Phase 2: fade label, trigger drift
+                // Phase 2: fade label, trigger drift (labels ghost away)
                 hideDemoLabel();
-                triggerOneDrift(); // labels ghost away
+                triggerOneDrift();
 
                 // Phase 3: 1s into drift, blend to next palette
-                // Labels are fully ghosted by now, so color change is invisible to them
                 setTimeout(() => {
-                    currentDemoH = (currentDemoH + 1) % 24;
-                    applyDemoHour(currentDemoH);
+                    demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
+                    applyDemoHour(demoSteps[demoStepIdx].h);
                 }, COLOR_DELAY);
 
                 // Phase 4: drift settles — labels reappear in new color, start next dwell
@@ -745,7 +764,7 @@
         }
 
         shiftReality();
-        applyDemoHour(0);
+        applyDemoHour(demoSteps[0].h);
         runDemoStep();
         update();
     </script>
