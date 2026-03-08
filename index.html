@@ -201,16 +201,16 @@
         /* Ghosting Effect during Drift */
         .is-h-drifting .hour-label,
         .is-m-drifting .minute-label {
-            opacity: 0;
-            filter: blur(8px);
-            transition: opacity 1.5s ease-in, filter 1.5s ease-in;
+            opacity: 0.12;
+            filter: blur(4px);
+            transition: opacity 3s ease, filter 3s ease;
         }
 
         .is-h-drifting .hand.hour,
         .is-m-drifting .hand.minute {
-            opacity: 0;
-            filter: blur(6px);
-            transition: opacity 1.5s ease-in, filter 1.5s ease-in;
+            opacity: 0.12;
+            filter: blur(3px);
+            transition: opacity 3s ease, filter 3s ease;
         }
 
         /* Laser beam hands — from design 4, colors adapt to time of day */
