@@ -571,63 +571,53 @@
             return { h: h * 360, s: s * 100, l: l * 100 };
         }
 
-        // Build a glow-only text-shadow (no chromatic offset) so letterforms stay crisp.
-        // The solid color is applied directly to element.style.color in the update loop.
+        // Build a Golden (45°) glow-only text-shadow for the background layer.
         function vibrantGlowShadow(textHex, isHour) {
-            const { r, g, b } = hexToRgb(textHex);
-            const { h, s } = rgbToHsl(r, g, b);
-            const baseHue = s < 8 ? 260 : h;
+            // Force the glow to a clean, premium Gold/Amber (45°)
+            const baseHue = 45;
             const bloomL = isHour ? 85 : 80;
 
             if (isHour) {
                 return [
-                    `0 0 8px  hsl(${baseHue.toFixed(0)}, 100%, ${bloomL}%, 0.9)`,
-                    `0 0 20px hsl(${baseHue.toFixed(0)}, 100%, 65%, 0.6)`,
-                    `0 0 40px hsl(${baseHue.toFixed(0)}, 100%, 55%, 0.3)`
+                    `0 0 8px  6px hsl(${baseHue}, 100%, ${bloomL}%, 0.8)`,
+                    `0 0 20px 10px hsl(${baseHue}, 100%, 65%, 0.5)`,
+                    `0 0 45px 15px hsl(${baseHue}, 100%, 55%, 0.2)`
                 ].join(', ');
             } else {
                 return [
-                    `0 0 6px  hsl(${baseHue.toFixed(0)}, 100%, ${bloomL}%, 0.8)`,
-                    `0 0 16px hsl(${baseHue.toFixed(0)}, 100%, 60%, 0.5)`,
-                    `0 0 32px hsl(${baseHue.toFixed(0)}, 100%, 50%, 0.2)`
+                    `0 0 6px  4px hsl(${baseHue}, 100%, ${bloomL}%, 0.7)`,
+                    `0 0 16px 8px hsl(${baseHue}, 100%, 60%, 0.4)`,
+                    `0 0 32px 12px hsl(${baseHue}, 100%, 50%, 0.1)`
                 ].join(', ');
             }
         }
 
-        // Compute the vibrant solid color for the label text itself.
-        // faceCenterHex is used to determine if the face is light or dark,
-        // so we can flip the label lightness for maximum contrast.
+        // Compute the desaturated Sky Blue (200°) or White color for the front-row labels.
         function vibrantLabelColor(textHex, isHour, faceCenterHex) {
-            const { r, g, b } = hexToRgb(textHex);
-            const { h, s } = rgbToHsl(r, g, b);
-            // Low-sat text: use cerulean (200°) rather than deep indigo (260°) — reads as fresh sky not heavy navy
-            const baseHue = s < 8 ? 200 : h;
+            // Force main labels to a crisp, desaturated Sky Blue (200°)
+            const baseHue = 200;
 
             // Check face brightness
             const fc = hexToRgb(faceCenterHex);
             const faceLum = (fc.r * 0.299 + fc.g * 0.587 + fc.b * 0.114) / 255;
             const isLightFace = faceLum > 0.45;
 
-            // On very bright faces (7AM, noon): lighter labels feel airy, not heavy
-            // On moderately light faces: slightly darker for readability
-            // On dark faces: bright saturated glow
+            // Maintain high contrast vs face, but prioritize an "Airy White" feel
             const l = !isLightFace
-                ? (isHour ? 90 : 85)
+                ? (isHour ? 95 : 90)
                 : faceLum > 0.80
-                    ? (isHour ? 50 : 56)
-                    : (isHour ? 40 : 44);
-            return `hsl(${baseHue.toFixed(0)}, 100%, ${l}%)`;
+                    ? (isHour ? 60 : 66)
+                    : (isHour ? 50 : 54);
+            return `hsl(${baseHue}, 40%, ${l}%)`; // Saturated at 40% for "Sky" feel
         }
 
-        // Trail shadow — softer bloom, same scheme
+        // Trail shadow — Golden (45°) soft bloom
         function vibrantTrailShadow(textHex, isHour) {
-            const { r, g, b } = hexToRgb(textHex);
-            const { h, s } = rgbToHsl(r, g, b);
-            const baseHue = s < 8 ? 260 : h;
-            const a = isHour ? 0.7 : 0.5;
+            const baseHue = 45;
+            const a = isHour ? 0.6 : 0.4;
             return [
-                `0 0 6px  hsl(${baseHue.toFixed(0)}, 100%, 80%, ${a})`,
-                `0 0 14px hsl(${baseHue.toFixed(0)}, 100%, 65%, ${a * 0.6})`
+                `0 0 6px  hsl(${baseHue}, 100%, 80%, ${a})`,
+                `0 0 14px hsl(${baseHue}, 100%, 65%, ${a * 0.6})`
             ].join(', ');
         }
 
