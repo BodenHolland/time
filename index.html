@@ -144,7 +144,7 @@
             align-items: center;
             justify-content: center;
             opacity: 0;
-            transition: opacity 3s ease;
+            transition: opacity 3s ease, color 3s ease;
             filter: blur(1.5px);
         }
 
@@ -169,7 +169,7 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transition: opacity 3s ease, filter 3s ease;
+            transition: opacity 3s ease, filter 3s ease, color 3s ease-in-out;
             font-size: var(--label-size);
             white-space: nowrap;
             text-align: center;
@@ -221,7 +221,7 @@
             transform-origin: 50% 100%;
             border-radius: 10vmin;
             z-index: 100;
-            transition: opacity 3s ease, filter 3s ease;
+            transition: opacity 3s ease, filter 3s ease, background 3s ease-in-out, box-shadow 3s ease-in-out;
         }
 
         .hand.hour {
@@ -356,11 +356,12 @@
 
 <body>
 
-    <div id="version-tag">V8 (DEMO)</div>
+    <div id="version-tag">V8 (COLOR DEMO)</div>
     <div id="clock-shadow"></div>
     <div id="demo-time-label"></div>
     <div id="demo-description">
-        Gallery Mode: A 12-second cycle through the clock's atmospheric range, from Honey Sunrise to Copper Sunset.
+        Gallery Mode: Atmospheric Color Study. Focuses on smooth transitions for the face, hands, and digits across the
+        solar cycle.
     </div>
     <div id="clock-bezel">
         <div id="clock-face">
@@ -938,17 +939,19 @@
             showDemoLabel(step.label);
 
             setTimeout(() => {
-                // Phase 2: fade label, trigger drift (labels ghost away)
+                // Phase 2: fade label
                 hideDemoLabel();
-                triggerOneDrift();
 
-                // Phase 3: 1s into drift, blend to next palette
-                setTimeout(() => {
-                    demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
-                    applyDemoHour(demoSteps[demoStepIdx].h);
-                }, 1000);
+                // Phase 3: blend to next palette
+                demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
+                applyDemoHour(demoSteps[demoStepIdx].h);
 
-                // Phase 4: drift settles — start next dwell
+                // If starting a new full loop, trigger a subtle repositioning "breath"
+                if (demoStepIdx === 0) {
+                    triggerOneDrift();
+                }
+
+                // Phase 4: continue the loop
                 setTimeout(runDemoStep, DRIFT_MS);
 
             }, DWELL_MS);
