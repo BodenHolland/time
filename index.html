@@ -867,15 +867,15 @@
         const COLOR_DELAY = 1000; // Blend starts after drift trigger
 
         const demoSteps = [
-            { h: 6, label: '6 AM — Honey Sunrise' },
-            { h: 9, label: '9 AM — Early Sky' },
-            { h: 12, label: '12 PM — Pure Midday' },
-            { h: 15, label: '3 PM — Afternoon Drift' },
-            { h: 16, label: '4 PM — Moonlit Pearl' },
-            { h: 17, label: '5:30 PM — Golden Hour' },
-            { h: 18, label: '6:15 PM — Copper Sunset' },
-            { h: 19, label: '7:30 PM — Twilight Violet' },
-            { h: 22, label: '10 PM — Deep Navy' },
+            { h: 6, label: '6 AM' },
+            { h: 9, label: '9 AM' },
+            { h: 12, label: '12 PM' },
+            { h: 15, label: '3 PM' },
+            { h: 16, label: '4 PM' },
+            { h: 17, label: '5:30 PM' },
+            { h: 18, label: '6:15 PM' },
+            { h: 19, label: '7:30 PM' },
+            { h: 22, label: '10 PM' },
         ];
 
         let demoStepIdx = 0;
@@ -933,28 +933,24 @@
         function runDemoStep() {
             window.isDemoActive = true;
             document.body.classList.add('is-demo-active');
+
             const step = demoSteps[demoStepIdx];
 
-            // Phase 1: dwell — labels visible, color stable
+            // SYNC: Update both label and color at the exact same time
+            // The 3s CSS transition handles the smooth fade into this state
             showDemoLabel(step.label);
+            applyDemoHour(step.h);
 
-            setTimeout(() => {
-                // Phase 2: Show label stays visible during the fade for clarity
-                // We no longer call hideDemoLabel here
+            // Subtle repositioning "breath" at the start of every full loop
+            if (demoStepIdx === 0) {
+                triggerOneDrift();
+            }
 
-                // Phase 3: blend to next palette (3s CSS transition handles the fade)
-                demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
-                applyDemoHour(demoSteps[demoStepIdx].h);
+            // Move to next step index for the next call
+            demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
 
-                // If starting a new full loop, trigger a subtle repositioning "breath"
-                if (demoStepIdx === 0) {
-                    triggerOneDrift();
-                }
-
-                // Phase 4: continue the loop (wait for the fade to complete + dwell)
-                setTimeout(runDemoStep, 4000);
-
-            }, DWELL_MS);
+            // Total cycle: 3s transition + 5s dwell = 8s
+            setTimeout(runDemoStep, 8000);
         }
 
         shiftReality();
