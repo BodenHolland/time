@@ -640,11 +640,9 @@
             const isLightFace = faceLum > 0.40;
 
             if (isLightFace) {
-                // Shift brown/amber (10-65°), olive-yellow (65-120°), and green/mint (120-180°)
-                // towards cool sky-blue and periwinkle tones for a fresher daytime look.
-                if (hourHue >= 10 && hourHue <= 65) hourHue = 205;  // brown → sky blue
-                else if (hourHue > 65 && hourHue <= 120) hourHue = 220; // olive → soft periwinkle
-                else if (hourHue > 120 && hourHue <= 180) hourHue = 210; // green → light blue
+                // Hour hand: Shift from dark blues to a soft, airy Purple/Lavender (265°)
+                if (hourHue >= 10 && hourHue <= 160) hourHue = 265;
+                else if (hourHue > 160 && hourHue <= 240) hourHue = 270;
 
                 // Force minute hand to a crisp Sky Blue (200°) to match common sky tones
                 // and skip the muddier/purpler complements during Golden Hour.
@@ -654,11 +652,10 @@
             }
 
             // Light faces: scale hand lightness with face brightness
-            // Very bright (7AM warmth, noon, lum>0.80): lighter hands so they feel airy
-            // Moderately light (lum 0.40-0.80): slightly darker for readability
-            const lightTipL = faceLum > 0.80 ? 35 : 25;
-            const lightMidL = faceLum > 0.80 ? 28 : 20;
-            const lightBaseL = faceLum > 0.80 ? 20 : 14;
+            // Increased lightness values (45-30) for a more "glowy" premium feel
+            const lightTipL = faceLum > 0.80 ? 45 : 35;
+            const lightMidL = faceLum > 0.80 ? 38 : 30;
+            const lightBaseL = faceLum > 0.80 ? 30 : 25;
             const tipL = isLightFace ? lightTipL : 85;
             const midL = isLightFace ? lightMidL : 65;
             const baseL = isLightFace ? lightBaseL : 50;
