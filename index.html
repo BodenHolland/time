@@ -80,7 +80,7 @@
             border: 0.10vmin solid color-mix(in srgb, var(--current-accent, rgba(0, 0, 0, 1)) 15%, rgba(0, 0, 0, 0.15));
 
             transform: scale(1) translateZ(0);
-            transition: background 7s ease, border 7s ease, box-shadow 7s ease;
+            transition: background 3s ease-in-out, border 3s ease-in-out, box-shadow 3s ease-in-out;
         }
 
         /* Color-shifting radial face — from design 3 */
@@ -93,7 +93,7 @@
             box-shadow:
                 inset 0 0 4vmin rgba(255, 255, 255, 0.06),
                 inset 2vmin 2vmin 5vmin rgba(0, 0, 0, 0.2);
-            transition: background 7s ease;
+            transition: background 3s ease-in-out;
             overflow: hidden;
         }
 
@@ -939,10 +939,10 @@
             showDemoLabel(step.label);
 
             setTimeout(() => {
-                // Phase 2: fade label
-                hideDemoLabel();
+                // Phase 2: Show label stays visible during the fade for clarity
+                // We no longer call hideDemoLabel here
 
-                // Phase 3: blend to next palette
+                // Phase 3: blend to next palette (3s CSS transition handles the fade)
                 demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
                 applyDemoHour(demoSteps[demoStepIdx].h);
 
@@ -951,8 +951,8 @@
                     triggerOneDrift();
                 }
 
-                // Phase 4: continue the loop
-                setTimeout(runDemoStep, DRIFT_MS);
+                // Phase 4: continue the loop (wait for the fade to complete + dwell)
+                setTimeout(runDemoStep, 4000);
 
             }, DWELL_MS);
         }
