@@ -652,10 +652,12 @@
             }
 
             // Light faces: scale hand lightness with face brightness
-            // Increased lightness values (45-30) for a more "glowy" premium feel
-            const lightTipL = faceLum > 0.80 ? 45 : 35;
-            const lightMidL = faceLum > 0.80 ? 38 : 30;
-            const lightBaseL = faceLum > 0.80 ? 30 : 25;
+            // Increased lightness significantly (55-40) and reduced saturation (45%)
+            // to avoid "high chroma" and "dark ends" feel.
+            const s = isLightFace ? '45%' : '100% ';
+            const lightTipL = faceLum > 0.80 ? 55 : 45;
+            const lightMidL = faceLum > 0.80 ? 48 : 40;
+            const lightBaseL = faceLum > 0.80 ? 40 : 35;
             const tipL = isLightFace ? lightTipL : 85;
             const midL = isLightFace ? lightMidL : 65;
             const baseL = isLightFace ? lightBaseL : 50;
@@ -670,26 +672,25 @@
             minuteHand.style.width = minuteW;
 
             // Hour hand gradient + glow
-            // base opacity 0.4 means the shaft is never invisible even at the root
             hourHand.style.background = `linear-gradient(to top,
-                hsl(${hourHue}, 100%, ${midL}%, 0.4) 0%,
-                hsl(${hourHue}, 100%, ${midL}%, 0.8) 40%,
-                hsl(${hourHue}, 100%, ${tipL}%, 1) 100%)`;
+                hsl(${hourHue}, ${s}, ${midL}%, 0.4) 0%,
+                hsl(${hourHue}, ${s}, ${midL}%, 0.8) 40%,
+                hsl(${hourHue}, ${s}, ${tipL}%, 1) 100%)`;
             hourHand.style.boxShadow = [
-                `0 0 0.4vmin hsl(${hourHue}, 100%, ${tipL}%, ${glowA})`,
-                `0 0 1.5vmin hsl(${hourHue}, 100%, ${midL}%, ${glowA * 0.55})`,
-                `0 0 4vmin   hsl(${hourHue}, 100%, ${baseL}%, ${glowA * 0.25})`
+                `0 0 0.4vmin hsl(${hourHue}, ${s}, ${tipL}%, ${glowA})`,
+                `0 0 1.5vmin hsl(${hourHue}, ${s}, ${midL}%, ${glowA * 0.55})`,
+                `0 0 4vmin   hsl(${hourHue}, ${s}, ${baseL}%, ${glowA * 0.25})`
             ].join(', ');
 
             // Minute hand gradient + glow
             minuteHand.style.background = `linear-gradient(to top,
-                hsl(${minuteHue}, 100%, ${midL}%, 0.4) 0%,
-                hsl(${minuteHue}, 100%, ${midL}%, 0.8) 40%,
-                hsl(${minuteHue}, 100%, ${tipL}%, 1) 100%)`;
+                hsl(${minuteHue}, ${s}, ${midL}%, 0.4) 0%,
+                hsl(${minuteHue}, ${s}, ${midL}%, 0.8) 40%,
+                hsl(${minuteHue}, ${s}, ${tipL}%, 1) 100%)`;
             minuteHand.style.boxShadow = [
-                `0 0 0.4vmin hsl(${minuteHue}, 100%, ${tipL}%, ${glowA})`,
-                `0 0 1.5vmin hsl(${minuteHue}, 100%, ${midL}%, ${glowA * 0.55})`,
-                `0 0 4vmin   hsl(${minuteHue}, 100%, ${baseL}%, ${glowA * 0.2})`
+                `0 0 0.4vmin hsl(${minuteHue}, ${s}, ${tipL}%, ${glowA})`,
+                `0 0 1.5vmin hsl(${minuteHue}, ${s}, ${midL}%, ${glowA * 0.55})`,
+                `0 0 4vmin   hsl(${minuteHue}, ${s}, ${baseL}%, ${glowA * 0.2})`
             ].join(', ');
             // Second hand stays constant vibrant red
 
