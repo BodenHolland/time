@@ -646,9 +646,11 @@
                 else if (hourHue > 65 && hourHue <= 120) hourHue = 220; // olive → soft periwinkle
                 else if (hourHue > 120 && hourHue <= 180) hourHue = 210; // green → light blue
 
-                if (minuteHue >= 10 && minuteHue <= 65) minuteHue = 220; // brown → periwinkle
-                else if (minuteHue > 65 && minuteHue <= 120) minuteHue = 195; // olive → cool teal
-                else if (minuteHue > 120 && minuteHue <= 180) minuteHue = 200; // green → sky blue
+                // Force minute hand to a crisp Sky Blue (200°) to match common sky tones
+                // and skip the muddier/purpler complements during Golden Hour.
+                if (minuteHue > 240 || minuteHue < 180) {
+                    minuteHue = 200;
+                }
             }
 
             // Light faces: scale hand lightness with face brightness
