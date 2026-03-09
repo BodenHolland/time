@@ -356,11 +356,11 @@
 
 <body>
 
-    <div id="version-tag">V7</div>
+    <div id="version-tag">V8 (DEMO)</div>
     <div id="clock-shadow"></div>
-    <div id="demo-time-label" style="display: none;"></div>
-    <div id="demo-description" style="display: none;">
-        Seasonally Aware: Approximates sunrise & sunset via system date to dynamically anchor the 24-hour hue cycle.
+    <div id="demo-time-label"></div>
+    <div id="demo-description">
+        Gallery Mode: A 12-second cycle through the clock's atmospheric range, from Honey Sunrise to Copper Sunset.
     </div>
     <div id="clock-bezel">
         <div id="clock-face">
@@ -699,8 +699,9 @@
 
         function update() {
             const now = new Date();
-            const h = now.getHours();
-            const m = now.getMinutes();
+            const isDemo = window.isDemoActive || false;
+            const h = isDemo ? currentDemoH : now.getHours();
+            const m = isDemo ? 0 : now.getMinutes(); // Demo stays on the hour for clarity
             const s = now.getSeconds();
 
             let effectiveH = h;
@@ -865,26 +866,20 @@
         const COLOR_DELAY = 1000; // Blend starts after drift trigger
 
         const demoSteps = [
-            { h: 20, label: '10 PM' },
-            { h: 23, label: '11 PM – 2 AM' },
-            { h: 3, label: '2 AM – 5 AM' },
-            { h: 5, label: '5 AM' },
-            { h: 6, label: '6 AM' },
-            { h: 7, label: '7 AM' },
-            { h: 8, label: '8 AM' },
-            { h: 9, label: '9 – 10 AM' },
-            { h: 11, label: '11 AM' },
-            { h: 12, label: '12 PM' },
-            { h: 13, label: '1 PM' },
-            { h: 14, label: '2 PM' },
-            { h: 15, label: '3 PM' },
-            { h: 16, label: '4 PM' },
-            { h: 17, label: '5 PM' },
-            { h: 18, label: '6 PM' },
-            { h: 19, label: '7 PM' },
+            { h: 6, label: '6 AM — Honey Sunrise' },
+            { h: 9, label: '9 AM — Early Sky' },
+            { h: 12, label: '12 PM — Pure Midday' },
+            { h: 15, label: '3 PM — Afternoon Drift' },
+            { h: 16, label: '4 PM — Moonlit Pearl' },
+            { h: 17, label: '5:30 PM — Golden Hour' },
+            { h: 18, label: '6:15 PM — Copper Sunset' },
+            { h: 19, label: '7:30 PM — Twilight Violet' },
+            { h: 22, label: '10 PM — Deep Navy' },
         ];
 
         let demoStepIdx = 0;
+        currentDemoH = demoSteps[0].h;
+        window.isDemoActive = false;
 
         function applyDemoHour(h) {
             currentDemoH = h % 24;
@@ -899,12 +894,39 @@
 
         function showDemoLabel(text) {
             const el = document.getElementById('demo-time-label');
-            el.textContent = text;
-            el.style.opacity = '1';
+            if (el) {
+                el.textContent = text;
+                el.style.opacity = '1';
+            }
         }
 
         function hideDemoLabel() {
-            document.getElementById('demo-time-label').style.opacity = '0';
+            const el = document.getElementById('demo-time-label');
+            if (el) el.style.opacity = '0';
+        }
+
+        function triggerOneDrift() {
+            const hAngle = Math.random() * Math.PI * 2;
+            const newHTargetX = Math.cos(hAngle) * RADIUS;
+            const newHTargetY = Math.sin(hAngle) * RADIUS;
+            const mPos = getSafeXY(newHTargetX, newHTargetY);
+            const bezel = document.getElementById('clock-bezel');
+
+            // Both labels drift together
+            bezel.classList.add('is-h-drifting', 'is-m-drifting');
+
+            // Set targets slightly after the ghost starts
+            setTimeout(() => {
+                hTargetX = newHTargetX;
+                hTargetY = newHTargetY;
+                mTargetX = mPos.x;
+                mTargetY = mPos.y;
+            }, 100);
+
+            // Hands arrive at ~6.5s in V7, so we clear the ghosting then
+            setTimeout(() => {
+                bezel.classList.remove('is-h-drifting', 'is-m-drifting');
+            }, 7000);
         }
 
         function runDemoStep() {
@@ -924,9 +946,9 @@
                 setTimeout(() => {
                     demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
                     applyDemoHour(demoSteps[demoStepIdx].h);
-                }, COLOR_DELAY);
+                }, 1000);
 
-                // Phase 4: drift settles — labels reappear in new color, start next dwell
+                // Phase 4: drift settles — start next dwell
                 setTimeout(runDemoStep, DRIFT_MS);
 
             }, DWELL_MS);
@@ -934,24 +956,10 @@
 
         shiftReality();
         update();
+        runDemoStep();
 
         // ─── Production: Independent Hour & Minute drifts ───
         // Dwell time (10-15s) happens AFTER the transition finishes.
-        function scheduleDriftLoop(type) {
-            const transitionDuration = 6500;
-            const minDwell = 10000;
-            const randomDwell = Math.random() * 5000;
-
-            setTimeout(() => {
-                triggerHandDrift(type);
-                // The next cycle starts only after [Transition + Dwell]
-                scheduleDriftLoop(type);
-            }, transitionDuration + minDwell + randomDwell);
-        }
-
-        // Start them offset so they don't both move at the exact same time
-        setTimeout(() => scheduleDriftLoop('hour'), 2000);
-        setTimeout(() => scheduleDriftLoop('minute'), 8000);
     </script>
 </body>
 
