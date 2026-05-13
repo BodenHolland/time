@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,14 +13,11 @@
             --clock-size: 75vmin;
             --label-size: 8vmin;
             --reality-ease: cubic-bezier(0.16, 1, 0.3, 1);
-
             /* Dynamic Time Colors — driven by JS */
             --face-center: #1a1a24;
             --face-edge: #050508;
-
             /* Glow colors — driven by JS from palette text colors */
         }
-
         html,
         body {
             margin: 0;
@@ -34,7 +30,6 @@
             font-family: 'Inter', sans-serif;
             overflow: hidden;
         }
-
         /* Separate container to cast the drop shadow without being clipped by the WebKit backdrop-filter bug */
         #clock-shadow {
             position: absolute;
@@ -47,7 +42,6 @@
             transform: scale(1) translateZ(0);
             transition: box-shadow 1s linear;
         }
-
         /* iOS Vibrant Liquid Glass Bezel — 3D raised convex glass */
         #clock-bezel {
             width: var(--clock-size);
@@ -59,11 +53,9 @@
             position: relative;
             box-sizing: border-box;
             padding: 2vmin;
-
             background: color-mix(in srgb, var(--next-accent, rgba(255, 255, 255, 1)) 15%, rgba(255, 255, 255, 0.25));
             backdrop-filter: blur(40px) saturate(200%);
             -webkit-backdrop-filter: blur(40px) saturate(200%);
-
             box-shadow:
                 /* Fine bright edge at very top of the rim — primary specular hit */
                 inset 0.1vmin 0.1vmin 0.2vmin rgba(255, 255, 255, 1),
@@ -75,14 +67,11 @@
                 inset -0.6vmin -0.6vmin 2vmin rgba(0, 0, 0, 0.18),
                 /* Deep inner rim darkening for glass thickness illusion */
                 inset -1.2vmin -1.2vmin 4vmin rgba(0, 0, 0, 0.12);
-
             /* Lighter, thinner border for a more premium glass edge */
             border: 0.10vmin solid color-mix(in srgb, var(--current-accent, rgba(0, 0, 0, 1)) 15%, rgba(0, 0, 0, 0.15));
-
             transform: scale(1) translateZ(0);
             transition: background 7s ease, border 7s ease, box-shadow 7s ease;
         }
-
         /* Color-shifting radial face — from design 3 */
         #clock-face {
             width: 100%;
@@ -96,7 +85,6 @@
             transition: background 7s ease;
             overflow: hidden;
         }
-
         /* Iridescent interference shimmer — from design 4 */
         #clock-face::before {
             content: '';
@@ -114,19 +102,16 @@
             mix-blend-mode: screen;
             pointer-events: none;
         }
-
         @keyframes shimmer-drift {
             from {
                 transform: rotate(0deg) scale(1);
                 opacity: 0.5;
             }
-
             to {
                 transform: rotate(60deg) scale(1.05);
                 opacity: 1;
             }
         }
-
         /* Viscous Trail Elements */
         .trail {
             position: absolute;
@@ -147,23 +132,19 @@
             transition: opacity 3s ease;
             filter: blur(1.5px);
         }
-
         .is-h-drifting .h-trail,
         .is-m-drifting .m-trail {
             opacity: 0.18;
             transition: opacity 0.5s ease;
         }
-
         /* Trails — color and text-shadow applied dynamically by JS */
         .h-trail {
             font-weight: 500;
             font-size: calc(var(--label-size) * 1.15);
         }
-
         .m-trail {
             font-weight: 200;
         }
-
         /* Labels with holographic chromatic aberration — from design 4 */
         .label {
             position: absolute;
@@ -183,21 +164,18 @@
             letter-spacing: -0.05em;
             transform: translate(-50%, -50%);
         }
-
         .hour-label {
             font-weight: 500;
             font-size: calc(var(--label-size) * 1.15);
             z-index: 12;
             /* color and text-shadow applied dynamically by JS */
         }
-
         .minute-label {
             font-weight: 200;
             z-index: 11;
             opacity: 0.9;
             /* color and text-shadow applied dynamically by JS */
         }
-
         /* Ghosting Effect during Drift */
         .is-h-drifting .hour-label,
         .is-m-drifting .minute-label {
@@ -205,14 +183,12 @@
             filter: blur(4px);
             transition: opacity 3s ease, filter 3s ease;
         }
-
         .is-h-drifting .hand.hour,
         .is-m-drifting .hand.minute {
             opacity: 0.12;
             filter: blur(3px);
             transition: opacity 3s ease, filter 3s ease;
         }
-
         /* Laser beam hands — from design 4, colors adapt to time of day */
         .hand {
             position: absolute;
@@ -223,14 +199,12 @@
             z-index: 100;
             transition: opacity 3s ease, filter 3s ease;
         }
-
         .hand.hour {
             width: 0.5vmin;
             height: 21vmin;
             /* background and box-shadow applied dynamically by JS */
             z-index: 101;
         }
-
         .hand.minute {
             width: 0.35vmin;
             height: 34vmin;
@@ -238,7 +212,6 @@
             opacity: 0.9;
             z-index: 100;
         }
-
         .hand.second {
             width: 0.2vmin;
             height: 34.8vmin;
@@ -253,7 +226,6 @@
                 0 0 1.5vmin rgba(255, 60, 100, 0.5),
                 0 0 4vmin rgba(255, 40, 80, 0.2);
         }
-
         /* Glass center pin — mirrors the face color, lighter and translucent */
         #clock-bezel::before {
             content: '';
@@ -278,7 +250,6 @@
                 0 0 0.3vmin rgba(255, 255, 255, 0.2),
                 0 0 1.5vmin color-mix(in srgb, var(--current-accent, white) 15%, transparent);
         }
-
         #version-tag {
             position: fixed;
             top: 4vmin;
@@ -293,7 +264,6 @@
             user-select: none;
             z-index: 2000;
         }
-
         #version-tag {
             position: fixed;
             top: 4vmin;
@@ -308,7 +278,6 @@
             user-select: none;
             z-index: 2000;
         }
-
         /* Demo time label — shows current simulated hour during dwell */
         #demo-time-label {
             position: fixed;
@@ -327,7 +296,6 @@
             user-select: none;
             z-index: 2000;
         }
-
         #demo-description {
             position: fixed;
             bottom: 3vmin;
@@ -346,16 +314,13 @@
             user-select: none;
             z-index: 2000;
         }
-
         .is-demo-active #demo-time-label,
         .is-demo-active #demo-description {
             opacity: 1;
         }
     </style>
 </head>
-
 <body>
-
     <div id="version-tag"></div>
     <div id="clock-shadow"></div>
     <div id="demo-time-label" style="display: none;"></div>
@@ -369,17 +334,14 @@
             <div id="h-trail-1" class="trail h-trail trail-1"></div>
             <div id="m-trail-2" class="trail m-trail trail-2"></div>
             <div id="m-trail-1" class="trail m-trail trail-1"></div>
-
             <!-- Main Labels -->
             <div id="h-label" class="label hour-label"></div>
             <div id="m-label" class="label minute-label"></div>
-
             <div class="hand hour"></div>
             <div class="hand minute"></div>
             <div class="hand second"></div>
         </div>
     </div>
-
     <script>
         // Full 24-hour color palette — from design 3 (restored text colors)
         const timePalettes = [
@@ -408,34 +370,27 @@
             { center: '#201e58', edge: '#0c0a32', text: '#a8a8ff' }, // 22: Night
             { center: '#1e1c50', edge: '#0a0828', text: '#b0aaff' }  // 23: Night
         ];
-
         let lastMilestone = -1;
         let lastSecond = -1;
         let rotS = 0;
         let currentDemoH = 0; // controlled by runDemoStep() state machine
         window.isDemoActive = false; // flag to switch between real-time and demo
-
         let hTargetX = 0, hTargetY = 0;
         let mTargetX = 0, mTargetY = 0;
-
         const RADIUS = 28.5;
-
         function getSafeXY(fixedX, fixedY, attempt = 0) {
             // Pick a random point on the circle
             const angle = Math.random() * Math.PI * 2;
             const x = Math.cos(angle) * RADIUS;
             const y = Math.sin(angle) * RADIUS;
-
             // Check distance from the fixed point
             const dist = Math.sqrt((x - fixedX) ** 2 + (y - fixedY) ** 2);
-
             // If too close, try again (up to 10 times to avoid infinite recursion)
             if (dist < 26 && attempt < 10) {
                 return getSafeXY(fixedX, fixedY, attempt + 1);
             }
             return { x, y };
         }
-
         function shiftReality() {
             // Initial placement only — demo loop drives all subsequent drifts
             const hAngle = Math.random() * Math.PI * 2;
@@ -447,22 +402,18 @@
             mTargetX = mPos.x;
             mTargetY = mPos.y;
         }
-
         // Logic to trigger a drift for a specific hand (hour or minute)
         function triggerHandDrift(type) {
             const isH = type === 'hour';
             const driftingClass = isH ? 'is-h-drifting' : 'is-m-drifting';
-
             // 1. Ghost out
             document.body.classList.add(driftingClass);
-
             // 2. Wait for ghosting to peak (1.5s), then update target
             setTimeout(() => {
                 // Ensure we don't land on top of the other hand
                 const otherX = isH ? mTargetX : hTargetX;
                 const otherY = isH ? mTargetY : hTargetY;
                 const pos = getSafeXY(otherX, otherY);
-
                 if (isH) {
                     hTargetX = pos.x;
                     hTargetY = pos.y;
@@ -471,14 +422,12 @@
                     mTargetY = pos.y;
                 }
             }, 1600);
-
             // 3. Keep ghosted while "sailing" to new spot 
             // (The sweep speed 0.015 takes roughly 5-6s to settle)
             setTimeout(() => {
                 document.body.classList.remove(driftingClass);
             }, 6500);
         }
-
         /**
          * Approximates sunrise and sunset hours based on the day of the year.
          * Modeled for ~40°N latitude (standard mid-latitude).
@@ -491,19 +440,15 @@
             const diff = now - start;
             const oneDay = 1000 * 60 * 60 * 24;
             const dayOfYear = Math.floor(diff / oneDay);
-
             // Peaks at 1 on Summer Solstice (day 172), -1 on Winter Solstice (day 355)
             const seasonalOscillator = Math.cos((dayOfYear - 172) * 2 * Math.PI / 365.25);
-
             // Summer (osc=1): Sunrise 5:30, Sunset 20:30
             // Winter (osc=-1): Sunrise 7:30, Sunset 16:30
             const sunrise = 6.5 - seasonalOscillator * 1.0;
             const sunset = 18.5 + seasonalOscillator * 2.0;
             const solarNoon = (sunrise + sunset) / 2;
-
             return { sunrise, sunset, solarNoon };
         }
-
         /**
          * Helper to blend two hex colors
          */
@@ -519,7 +464,6 @@
             const b = Math.round(b1 + (b2 - b1) * p);
             return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
         }
-
         /**
          * Maps real local time [0-24] to a "virtual solar hour" [0-24].
          * Virtual 6 is always Sunrise.
@@ -529,7 +473,6 @@
         function getVirtualSolarHour(realH, realM, realS) {
             const time = realH + realM / 60 + realS / 3600;
             const { sunrise, sunset, solarNoon } = getSolarAnchors();
-
             if (time < sunrise) {
                 // Pre-dawn: [0 to Sunrise] -> [0 to 6]
                 return (time / sunrise) * 6;
@@ -544,14 +487,12 @@
                 return 18 + ((time - sunset) / (24 - sunset)) * 6;
             }
         }
-
         function hexToRgb(hex) {
             const r = parseInt(hex.slice(1, 3), 16);
             const g = parseInt(hex.slice(3, 5), 16);
             const b = parseInt(hex.slice(5, 7), 16);
             return { r, g, b };
         }
-
         // Convert RGB to HSL
         function rgbToHsl(r, g, b) {
             r /= 255; g /= 255; b /= 255;
@@ -570,13 +511,11 @@
             }
             return { h: h * 360, s: s * 100, l: l * 100 };
         }
-
         // Build a Golden (45°) glow-only text-shadow for the background layer.
         function vibrantGlowShadow(textHex, isHour) {
             // Force the glow to a clean, premium Gold/Amber (45°)
             const baseHue = 45;
             const bloomL = isHour ? 85 : 80;
-
             if (isHour) {
                 return [
                     `0 0 8px  6px hsl(${baseHue}, 100%, ${bloomL}%, 0.8)`,
@@ -591,17 +530,14 @@
                 ].join(', ');
             }
         }
-
         // Compute the desaturated Sky Blue (200°) or White color for the front-row labels.
         function vibrantLabelColor(textHex, isHour, faceCenterHex) {
             // Force main labels to a crisp, desaturated Sky Blue (200°)
             const baseHue = 200;
-
             // Check face brightness
             const fc = hexToRgb(faceCenterHex);
             const faceLum = (fc.r * 0.299 + fc.g * 0.587 + fc.b * 0.114) / 255;
             const isLightFace = faceLum > 0.45;
-
             // Maintain high contrast vs face, but prioritize an "Airy White" feel
             const l = !isLightFace
                 ? (isHour ? 95 : 90)
@@ -610,7 +546,6 @@
                     : (isHour ? 50 : 54);
             return `hsl(${baseHue}, 40%, ${l}%)`; // Saturated at 40% for "Sky" feel
         }
-
         // Trail shadow — Golden (45°) soft bloom
         function vibrantTrailShadow(textHex, isHour) {
             const baseHue = 45;
@@ -620,7 +555,6 @@
                 `0 0 14px hsl(${baseHue}, 100%, 65%, ${a * 0.6})`
             ].join(', ');
         }
-
         // Apply palette-driven colors to all three hands each frame.
         // Hour hand: hue from the palette edge color (deep, rich)
         // Minute hand: ~150° complement so it always contrasts the hour hand
@@ -630,27 +564,22 @@
             const { r: cr, g: cg, b: cb } = hexToRgb(centerHex);
             const { h: cH, s: cS } = rgbToHsl(cr, cg, cb);
             const faceHue = cS < 5 ? 250 : cH;
-
             // 180° complement for hour, 270° for minute — always visually distinct
             let hourHue = (faceHue + 180) % 360;
             let minuteHue = (faceHue + 270) % 360;
-
             // Face luminance
             const faceLum = (cr * 0.299 + cg * 0.587 + cb * 0.114) / 255;
             const isLightFace = faceLum > 0.40;
-
             if (isLightFace) {
                 // Hour hand: Shift from dark blues to a soft, airy Purple/Lavender (265°)
                 if (hourHue >= 10 && hourHue <= 160) hourHue = 210;
                 else if (hourHue > 160 && hourHue <= 240) hourHue = 220;
-
                 // Force minute hand to a crisp Sky Blue (200°) to match common sky tones
                 // and skip the muddier/purpler complements during Golden Hour.
                 if (minuteHue > 240 || minuteHue < 180) {
                     minuteHue = 200;
                 }
             }
-
             // Light faces: scale hand lightness with face brightness
             // Increased lightness significantly (55-40) and reduced saturation (45%)
             // to avoid "high chroma" and "dark ends" feel.
@@ -664,13 +593,10 @@
             const glowA = isLightFace ? 0.8 : 0.9;
             const hourW = isLightFace ? '0.65vmin' : '0.5vmin';
             const minuteW = isLightFace ? '0.5vmin' : '0.35vmin';
-
             const hourHand = document.querySelector('.hand.hour');
             const minuteHand = document.querySelector('.hand.minute');
-
             hourHand.style.width = hourW;
             minuteHand.style.width = minuteW;
-
             // Hour hand gradient + glow
             hourHand.style.background = `linear-gradient(to top,
                 hsl(${hourHue}, ${s}, ${midL}%, 0.4) 0%,
@@ -681,7 +607,6 @@
                 `0 0 1.5vmin hsl(${hourHue}, ${s}, ${midL}%, ${glowA * 0.55})`,
                 `0 0 4vmin   hsl(${hourHue}, ${s}, ${baseL}%, ${glowA * 0.25})`
             ].join(', ');
-
             // Minute hand gradient + glow
             minuteHand.style.background = `linear-gradient(to top,
                 hsl(${minuteHue}, ${s}, ${midL}%, 0.4) 0%,
@@ -693,16 +618,12 @@
                 `0 0 4vmin   hsl(${minuteHue}, ${s}, ${baseL}%, ${glowA * 0.2})`
             ].join(', ');
             // Second hand stays constant vibrant red
-
         }
-
-
         function update() {
             const now = new Date();
             const h = now.getHours();
             const m = now.getMinutes();
             const s = now.getSeconds();
-
             let effectiveH = h;
             let effectiveM = m - 3;
             if (effectiveM < 0) {
@@ -712,42 +633,31 @@
             if (effectiveH < 0) {
                 effectiveH += 24;
             }
-
             const displayH = effectiveH % 12 || 12;
             const mMilestone = Math.floor(effectiveM / 5) * 5;
-
             const hLabelEl = document.getElementById('h-label');
             const mLabelEl = document.getElementById('m-label');
-
             const trailsH = document.querySelectorAll('.h-trail');
             const trailsM = document.querySelectorAll('.m-trail');
-
             hLabelEl.textContent = displayH;
             trailsH.forEach(t => t.textContent = displayH);
-
             if (mMilestone !== lastMilestone) {
                 lastMilestone = mMilestone;
-
                 let displayM = String(lastMilestone);
                 if (lastMilestone === 5) {
                     displayM = '05';
                 } else if (lastMilestone === 0) {
                     displayM = '0';
                 }
-
                 mLabelEl.textContent = displayM;
                 trailsM.forEach(t => t.textContent = displayM);
             }
-
             const finalBaseHAngle = Math.atan2(hTargetY, hTargetX) * 180 / Math.PI + 90;
             const finalBaseMAngle = Math.atan2(mTargetY, mTargetX) * 180 / Math.PI + 90;
-
             const hOffset = (m / 60) * 30 + (s / 3600) * 30;
             const mOffset = (m - lastMilestone) * 6 + (s / 60) * 6;
-
             let targetH = finalBaseHAngle + hOffset;
             let targetM = finalBaseMAngle + mOffset;
-
             // ─── Color logic ───
             // If in demo mode, currentDemoH is controlled by the state machine.
             // If not in demo mode, we calculate it based on seasonal solar logic.
@@ -757,37 +667,29 @@
             } else {
                 solarH = getVirtualSolarHour(h, m, s);
             }
-
             const currentIdx = Math.floor(solarH) % 24;
             const nextIdx = (currentIdx + 1) % 24;
             const progress = solarH % 1;
-
             const cp = timePalettes[currentIdx];
             const np = timePalettes[nextIdx];
-
             // ─── Continuous color blending for production ───
             const interpolatedCenter = lerpColor(cp.center, np.center, progress);
             const interpolatedEdge = lerpColor(cp.edge, np.edge, progress);
             const interpolatedText = lerpColor(cp.text, np.text, progress);
-
             document.documentElement.style.setProperty('--face-center', interpolatedCenter);
             document.documentElement.style.setProperty('--face-edge', interpolatedEdge);
             document.documentElement.style.setProperty('--current-accent', interpolatedText);
             document.documentElement.style.setProperty('--next-accent', np.text);
-
             // ─── Vibrant label glows from interpolated text color ───
             const textRgb = interpolatedText; // lerpColor returns rgb() string
-
             // Refactor vibrant functions to handle rgb() or hex
             const getColorSource = (c) => c;
-
             const hColor = vibrantLabelColor(interpolatedText, true, interpolatedCenter);
             const mColor = vibrantLabelColor(interpolatedText, false, interpolatedCenter);
             const hGlow = vibrantGlowShadow(interpolatedText, true);
             const mGlow = vibrantGlowShadow(interpolatedText, false);
             const trailShadow = vibrantTrailShadow(interpolatedText, true);
             const mTrailShadow = vibrantTrailShadow(interpolatedText, false);
-
             // Solid color = crisp letterforms; text-shadow = glow bloom on top
             const hLabel = document.getElementById('h-label');
             const mLabel = document.getElementById('m-label');
@@ -797,10 +699,8 @@
             mLabel.style.textShadow = mGlow;
             document.querySelectorAll('.h-trail').forEach(el => { el.style.color = hColor; el.style.textShadow = trailShadow; });
             document.querySelectorAll('.m-trail').forEach(el => { el.style.color = mColor; el.style.textShadow = mTrailShadow; });
-
             // Dynamic hand colors — hour + minute only, second stays red
             applyHandColors(cp.edge, cp.center);
-
             if (window.rotH === undefined) {
                 window.rotH = targetH;
                 window.rotM = targetM;
@@ -809,61 +709,47 @@
                 window.rotMT1 = targetM;
                 window.rotMT2 = targetM;
             }
-
             function sweep(current, target, speed) {
                 let diff = (target - current) % 360;
                 // Normalize to [-180, 180] for shortest path
                 if (diff > 180) diff -= 360;
                 if (diff < -180) diff += 360;
-
                 // Extremely tiny snap to prevent floating jitter at rest
                 if (Math.abs(diff) < 0.01) return target;
-
                 return current + diff * speed;
             }
-
             window.rotH = sweep(window.rotH, targetH, 0.015);
             window.rotM = sweep(window.rotM, targetM, 0.015);
-
             window.rotHT1 = sweep(window.rotHT1, targetH, 0.012);
             window.rotHT2 = sweep(window.rotHT2, targetH, 0.01);
-
             window.rotMT1 = sweep(window.rotMT1, targetM, 0.012);
             window.rotMT2 = sweep(window.rotMT2, targetM, 0.01);
-
             document.querySelector('.hand.hour').style.transform = `translateX(-50%) rotate(${window.rotH}deg)`;
             document.querySelector('.hand.minute').style.transform = `translateX(-50%) rotate(${window.rotM}deg)`;
-
             function updateLabel(id, rot, offset) {
                 const rad = (rot - offset - 90) * Math.PI / 180;
                 const x = Math.cos(rad) * RADIUS;
                 const y = Math.sin(rad) * RADIUS;
                 document.getElementById(id).style.transform = `translate3d(calc(-50% + ${x}vmin), calc(-50% + ${y}vmin), 0)`;
             }
-
             updateLabel('h-label', window.rotH, hOffset);
             updateLabel('h-trail-1', window.rotHT1, hOffset);
             updateLabel('h-trail-2', window.rotHT2, hOffset);
-
             updateLabel('m-label', window.rotM, mOffset);
             updateLabel('m-trail-1', window.rotMT1, mOffset);
             updateLabel('m-trail-2', window.rotMT2, mOffset);
-
             if (s !== lastSecond) {
                 const diff = (s - lastSecond + 60) % 60;
                 rotS += diff * 6;
                 lastSecond = s;
                 document.querySelector('.hand.second').style.transform = `translateX(-50%) rotate(${rotS}deg)`;
             }
-
             requestAnimationFrame(update);
         }
-
         // ─── Smooth Transition Constants ───
         const DWELL_MS = 3000;   // Wait at an hour
         const DRIFT_MS = 7000;   // Time for drift & shift
         const COLOR_DELAY = 1000; // Blend starts after drift trigger
-
         const demoSteps = [
             { h: 20, label: '10 PM' },
             { h: 23, label: '11 PM – 2 AM' },
@@ -883,9 +769,7 @@
             { h: 18, label: '6 PM' },
             { h: 19, label: '7 PM' },
         ];
-
         let demoStepIdx = 0;
-
         function applyDemoHour(h) {
             currentDemoH = h % 24;
             const cp = timePalettes[currentDemoH];
@@ -896,63 +780,50 @@
             document.documentElement.style.setProperty('--next-accent', np.text);
             document.documentElement.style.setProperty('--next-face', np.center);
         }
-
         function showDemoLabel(text) {
             const el = document.getElementById('demo-time-label');
             el.textContent = text;
             el.style.opacity = '1';
         }
-
         function hideDemoLabel() {
             document.getElementById('demo-time-label').style.opacity = '0';
         }
-
         function runDemoStep() {
             window.isDemoActive = true;
             document.body.classList.add('is-demo-active');
             const step = demoSteps[demoStepIdx];
-
             // Phase 1: dwell — labels visible, color stable
             showDemoLabel(step.label);
-
             setTimeout(() => {
                 // Phase 2: fade label, trigger drift (labels ghost away)
                 hideDemoLabel();
                 triggerOneDrift();
-
                 // Phase 3: 1s into drift, blend to next palette
                 setTimeout(() => {
                     demoStepIdx = (demoStepIdx + 1) % demoSteps.length;
                     applyDemoHour(demoSteps[demoStepIdx].h);
                 }, COLOR_DELAY);
-
                 // Phase 4: drift settles — labels reappear in new color, start next dwell
                 setTimeout(runDemoStep, DRIFT_MS);
-
             }, DWELL_MS);
         }
-
         shiftReality();
         update();
-
         // ─── Production: Independent Hour & Minute drifts ───
         // Dwell time (10-15s) happens AFTER the transition finishes.
         function scheduleDriftLoop(type) {
             const transitionDuration = 6500;
             const minDwell = 10000;
             const randomDwell = Math.random() * 5000;
-
             setTimeout(() => {
                 triggerHandDrift(type);
                 // The next cycle starts only after [Transition + Dwell]
                 scheduleDriftLoop(type);
             }, transitionDuration + minDwell + randomDwell);
         }
-
         // Start them offset so they don't both move at the exact same time
         setTimeout(() => scheduleDriftLoop('hour'), 2000);
         setTimeout(() => scheduleDriftLoop('minute'), 8000);
     </script>
 </body>
-
 </html>
